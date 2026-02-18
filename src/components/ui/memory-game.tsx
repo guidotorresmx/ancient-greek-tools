@@ -63,6 +63,15 @@ export function MemoryGame() {
   const [selected, setSelected] = React.useState<string[]>([]);
   const [score, setScore] = React.useState(0);
 
+  const STATS_CLASS =
+    "mb-4 flex items-center gap-4 text-sm text-muted-foreground";
+  const GRID_CLASS = "grid grid-cols-3 sm:grid-cols-6 gap-3";
+  const CARD_BASE =
+    "h-24 w-full rounded-md p-2 flex items-center justify-center";
+  const CARD_HOVER = "hover:shadow-md bg-white/80";
+  const CARD_DISABLED = "opacity-50 pointer-events-none";
+  const CARD_SELECTED = "ring-2 ring-primary animate-pop";
+
   function reset() {
     const list = GREEK.flatMap((g, i) => [
       { id: `${i}-name`, keyId: i, kind: "name", content: g[0] } as Card,
@@ -117,17 +126,17 @@ export function MemoryGame() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center gap-4">
-        <div className="text-sm text-muted-foreground">
+      <div className={STATS_CLASS}>
+        <div>
           Matches: {matchedCount} / {GREEK.length}
         </div>
-        <div className="text-sm text-muted-foreground">Score: {score}</div>
-        <Button onClick={reset} variant="default" size="sm" className="px-3">
+        <div>Score: {score}</div>
+        <Button onClick={reset} variant="default" size="sm">
           Restart
         </Button>
       </div>
 
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+      <div className={GRID_CLASS}>
         {cards.map((card) => {
           const isSelected = selected.includes(card.id);
           const isMatched = !!card.matched;
@@ -140,12 +149,9 @@ export function MemoryGame() {
               variant="ghost"
               size="lg"
               className={cn(
-                "h-24 w-full rounded-md p-2 text-sm shadow-sm flex items-center justify-center text-center",
-                isMatched
-                  ? "opacity-50 pointer-events-none"
-                  : "hover:shadow-md",
-                isSelected ? "ring-2 ring-primary animate-pop" : "bg-white/80",
-                wrong.includes(card.id) ? "animate-shake" : "",
+                CARD_BASE,
+                isMatched ? CARD_DISABLED : CARD_HOVER,
+                isSelected ? CARD_SELECTED : "",
               )}
             >
               {card.kind === "name" ? (
