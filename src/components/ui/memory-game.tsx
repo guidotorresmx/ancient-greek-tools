@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 type Card = {
   id: string;
@@ -63,6 +64,8 @@ export function MemoryGame() {
   const [selected, setSelected] = React.useState<string[]>([]);
   const [score, setScore] = React.useState(0);
 
+  const t = useTranslations("memory");
+
   const STATS_CLASS =
     "mb-4 flex items-center gap-4 text-sm text-muted-foreground";
   const GRID_CLASS = "grid grid-cols-3 sm:grid-cols-6 gap-3";
@@ -76,24 +79,6 @@ export function MemoryGame() {
     name: "bg-blue-50 dark:bg-blue-900",
     upper: "bg-yellow-50 dark:bg-yellow-900",
     lower: "bg-green-50 dark:bg-green-900",
-  };
-
-  const LABELS: Record<string, Record<string, string>> = {
-    en: { name: "Name", upper: "Upper", lower: "Lower" },
-    es: { name: "Nombre", upper: "Mayús", lower: "Minús" },
-  };
-  const lang = typeof navigator !== "undefined" ? navigator.language : "en";
-  const locale = lang.startsWith("es") ? "es" : "en";
-
-  const ABBR: Record<string, Record<string, string>> = {
-    en: { name: "N", upper: "A", lower: "a" },
-    es: { name: "N", upper: "M", lower: "m" },
-  };
-
-  const BADGE_CLASS: Record<string, string> = {
-    name: "bg-blue-600 text-white",
-    upper: "bg-amber-400 text-black",
-    lower: "bg-emerald-600 text-white",
   };
 
   function reset() {
@@ -164,18 +149,18 @@ export function MemoryGame() {
     <div>
       <div className={STATS_CLASS}>
         <div>
-          Matches: {matchedCount} / {GREEK.length}
+          {t("matches", { matched: matchedCount, total: GREEK.length })}
         </div>
-        <div>Score: {score}</div>
+        <div>{t("score", { score })}</div>
         <Button onClick={reset} variant="default" size="sm">
-          Restart
+          {t("restart")}
         </Button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Column: Names */}
         <div>
-          <div className="mb-2 text-sm font-medium">{LABELS[locale].name}</div>
+          <div className="mb-2 text-sm font-medium">{t("labels.name")}</div>
           <div className="flex flex-wrap gap-2">
             {cards
               .filter((c) => c.kind === "name")
@@ -207,7 +192,7 @@ export function MemoryGame() {
 
         {/* Column: Upper */}
         <div>
-          <div className="mb-2 text-sm font-medium">{LABELS[locale].upper}</div>
+          <div className="mb-2 text-sm font-medium">{t("labels.upper")}</div>
           <div className="flex flex-wrap gap-2">
             {cards
               .filter((c) => c.kind === "upper")
@@ -239,7 +224,7 @@ export function MemoryGame() {
 
         {/* Column: Lower */}
         <div>
-          <div className="mb-2 text-sm font-medium">{LABELS[locale].lower}</div>
+          <div className="mb-2 text-sm font-medium">{t("labels.lower")}</div>
           <div className="flex flex-wrap gap-2">
             {cards
               .filter((c) => c.kind === "lower")

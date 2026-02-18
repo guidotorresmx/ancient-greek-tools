@@ -1,0 +1,12 @@
+{
+  "memory": {
+    "labels": {
+      "name": "Name",
+      "upper": "Upper",
+      "lower": "Lower"
+    },
+    "matches": "Matches: {matched} / {total}",
+    "score": "Score: {score}",
+    "restart": "Restart"
+  }
+}

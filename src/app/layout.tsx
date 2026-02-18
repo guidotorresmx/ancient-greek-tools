@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/ui/navbar";
+import { NextIntlClientProvider } from "next-intl";
+import enMessages from "../locales/en.json";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,8 +30,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navbar />
-        <main className="p-8">{children}</main>
+        <NextIntlClientProvider locale="en" messages={enMessages as any}>
+          <Navbar />
+          <main className="p-8">{children}</main>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

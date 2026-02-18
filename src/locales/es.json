@@ -1,0 +1,12 @@
+{
+  "memory": {
+    "labels": {
+      "name": "Nombre",
+      "upper": "Mayúscula",
+      "lower": "Minúscula"
+    },
+    "matches": "Correctas: {matched} / {total}",
+    "score": "Puntuación: {score}",
+    "restart": "Reiniciar"
+  }
+}
