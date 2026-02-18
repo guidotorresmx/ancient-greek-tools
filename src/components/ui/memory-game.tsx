@@ -51,15 +51,20 @@ function shuffle<T>(arr: T[]) {
 }
 
 export function MemoryGame() {
-  const [cards, setCards] = React.useState<Card[]>(() => {
-    const list: Card[] = [];
-    GREEK.forEach((g, i) => {
-      list.push({ id: `${i}-name`, keyId: i, kind: "name", content: g[0] });
-      list.push({ id: `${i}-upper`, keyId: i, kind: "upper", content: g[1] });
-      list.push({ id: `${i}-lower`, keyId: i, kind: "lower", content: g[2] });
-    });
-    return shuffle(list);
-  });
+  function createList() {
+    return GREEK.flatMap((g, i) => [
+      { id: `${i}-name`, keyId: i, kind: "name", content: g[0] } as Card,
+      { id: `${i}-upper`, keyId: i, kind: "upper", content: g[1] } as Card,
+      { id: `${i}-lower`, keyId: i, kind: "lower", content: g[2] } as Card,
+    ]);
+  }
+
+  // use a deterministic initial order for server render, then shuffle on mount
+  const [cards, setCards] = React.useState<Card[]>(createList);
+
+  React.useEffect(() => {
+    setCards((_) => shuffle(createList()));
+  }, []);
 
   const [selected, setSelected] = React.useState<string[]>([]);
   const [score, setScore] = React.useState(0);
@@ -93,11 +98,22 @@ export function MemoryGame() {
   }
 
   React.useEffect(() => {
+    // (handled below) placeholder
+  }, [selected, cards]);
+
+  // Avoid re-running the matching logic when `cards` changes (it causes a loop).
+  // Use a ref to always read the latest cards inside an effect that only depends on `selected`.
+  const cardsRef = React.useRef<Card[]>(cards);
+  React.useEffect(() => {
+    cardsRef.current = cards;
+  }, [cards]);
+
+  React.useEffect(() => {
     if (selected.length < 3) return;
     const [aId, bId, cId] = selected;
-    const a = cards.find((c) => c.id === aId);
-    const b = cards.find((c) => c.id === bId);
-    const c = cards.find((c) => c.id === cId);
+    const a = cardsRef.current.find((c) => c.id === aId);
+    const b = cardsRef.current.find((c) => c.id === bId);
+    const c = cardsRef.current.find((c) => c.id === cId);
     if (!a || !b || !c) return;
 
     const sameKey = a.keyId === b.keyId && b.keyId === c.keyId;
@@ -119,7 +135,7 @@ export function MemoryGame() {
       const t = setTimeout(() => setSelected([]), 800);
       return () => clearTimeout(t);
     }
-  }, [selected, cards]);
+  }, [selected]);
 
   function handleClick(card: Card) {
     if (card.matched) return;
