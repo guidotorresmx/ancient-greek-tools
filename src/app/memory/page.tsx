@@ -8,10 +8,7 @@ export const metadata = {
 export default function Page() {
   return (
     <div>
-      <h1 className="mb-4 text-2xl font-semibold">Greek Letters Memory</h1>
-      <Card title="Match the name with upper- and lower-case glyphs">
-        <MemoryGame />
-      </Card>
+      <MemoryGame />
     </div>
   );
 }

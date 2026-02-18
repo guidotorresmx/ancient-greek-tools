@@ -9,6 +9,7 @@ type Card = {
   id: string;
   keyId: number;
   kind: "name" | "upper" | "lower";
+
   content: string;
   revealed?: boolean;
   matched?: boolean;
@@ -164,10 +165,15 @@ export function MemoryGame() {
   return (
     <div>
       <div className={STATS_CLASS}>
-        <div>
-          {t("matches", { matched: matchedCount, total: GREEK.length })}
+        <div className="flex items-baseline gap-3">
+          <div className="font-medium">
+            {t("matches", { matched: matchedCount, total: GREEK.length })}
+          </div>
+          <div className="font-medium">{t("score", { score })}</div>
+          <div className="text-xs text-muted-foreground">
+            {t("instructions")}
+          </div>
         </div>
-        <div>{t("score", { score })}</div>
         <Button onClick={reset} variant="default" size="sm">
           {t("restart")}
         </Button>

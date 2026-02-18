@@ -18,9 +18,9 @@ export function Navbar() {
   }
 
   return (
-    <header>
-      <nav>
-        <div className="flex items-center justify-between">
+    <header className="border-b">
+      <nav className="max-w-6xl mx-auto px-4">
+        <div className="flex items-center justify-between h-14">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2">
               <svg
@@ -59,63 +59,32 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="text-sm font-medium">Greek Tools</div>
+            <div className="text-sm font-medium text-muted-foreground mr-2">
+              Greek Tools
+            </div>
 
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                href="/letras"
-                aria-current={isActive("/letras") ? "page" : undefined}
-                className={
-                  isActive("/letras")
-                    ? navigationMenuTriggerStyle("font-semibold")
-                    : undefined
-                }
-              >
-                Letras
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                href="/editor"
-                aria-current={isActive("/editor") ? "page" : undefined}
-                className={
-                  isActive("/editor")
-                    ? navigationMenuTriggerStyle("font-semibold")
-                    : undefined
-                }
-              >
-                Editor
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                href="/flashcards"
-                aria-current={isActive("/flashcards") ? "page" : undefined}
-                className={
-                  isActive("/flashcards")
-                    ? navigationMenuTriggerStyle("font-semibold")
-                    : undefined
-                }
-              >
-                Flashcards
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                href="/lectura"
-                aria-current={isActive("/lectura") ? "page" : undefined}
-                className={
-                  isActive("/lectura")
-                    ? navigationMenuTriggerStyle("font-semibold")
-                    : undefined
-                }
-              >
-                Lectura
-              </NavigationMenuLink>
-            </NavigationMenuItem>
+            {/* Single-level nav items mapped from an array for consistency */}
+            {[
+              { href: "/letras", label: "Letras" },
+              { href: "/editor", label: "Editor" },
+              { href: "/flashcards", label: "Flashcards" },
+              { href: "/memory", label: "Memory" },
+              { href: "/lectura", label: "Lectura" },
+            ].map((item) => (
+              <NavigationMenuItem key={item.href}>
+                <NavigationMenuLink
+                  href={item.href}
+                  aria-current={isActive(item.href) ? "page" : undefined}
+                  className={navigationMenuTriggerStyle(
+                    isActive(item.href)
+                      ? "font-semibold text-primary"
+                      : "text-muted-foreground",
+                  )}
+                >
+                  {item.label}
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            ))}
           </div>
         </div>
       </nav>
