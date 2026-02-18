@@ -67,10 +67,34 @@ export function MemoryGame() {
     "mb-4 flex items-center gap-4 text-sm text-muted-foreground";
   const GRID_CLASS = "grid grid-cols-3 sm:grid-cols-6 gap-3";
   const CARD_BASE =
-    "h-24 w-full rounded-md p-2 flex items-center justify-center";
+    "relative rounded-md p-2 flex items-center justify-center text-sm";
+  const CARD_DIM = "h-12 w-28";
   const CARD_HOVER = "hover:shadow-md bg-white/80";
   const CARD_DISABLED = "opacity-50 pointer-events-none";
   const CARD_SELECTED = "ring-2 ring-primary animate-pop";
+  const KIND_STYLES: Record<string, string> = {
+    name: "bg-blue-50 dark:bg-blue-900",
+    upper: "bg-yellow-50 dark:bg-yellow-900",
+    lower: "bg-green-50 dark:bg-green-900",
+  };
+
+  const LABELS: Record<string, Record<string, string>> = {
+    en: { name: "Name", upper: "Upper", lower: "Lower" },
+    es: { name: "Nombre", upper: "Mayús", lower: "Minús" },
+  };
+  const lang = typeof navigator !== "undefined" ? navigator.language : "en";
+  const locale = lang.startsWith("es") ? "es" : "en";
+
+  const ABBR: Record<string, Record<string, string>> = {
+    en: { name: "N", upper: "A", lower: "a" },
+    es: { name: "N", upper: "M", lower: "m" },
+  };
+
+  const BADGE_CLASS: Record<string, string> = {
+    name: "bg-blue-600 text-white",
+    upper: "bg-amber-400 text-black",
+    lower: "bg-emerald-600 text-white",
+  };
 
   function reset() {
     const list = GREEK.flatMap((g, i) => [
@@ -118,8 +142,20 @@ export function MemoryGame() {
       setSelected((s) => s.filter((id) => id !== card.id));
       return;
     }
-    if (selected.length === 3) return;
-    setSelected((s) => [...s, card.id]);
+
+    setSelected((s) => {
+      // replace existing selection from same kind (column) if present
+      const idx = s.findIndex((id) => {
+        const c = cards.find((x) => x.id === id);
+        return c?.kind === card.kind;
+      });
+      if (idx >= 0) {
+        const copy = s.slice();
+        copy[idx] = card.id;
+        return copy;
+      }
+      return [...s, card.id];
+    });
   }
 
   const matchedCount = cards.filter((c) => c.matched).length / 3;
@@ -136,34 +172,102 @@ export function MemoryGame() {
         </Button>
       </div>
 
-      <div className={GRID_CLASS}>
-        {cards.map((card) => {
-          const isSelected = selected.includes(card.id);
-          const isMatched = !!card.matched;
-          return (
-            <Button
-              key={card.id}
-              onClick={() => handleClick(card)}
-              aria-pressed={isSelected}
-              disabled={isMatched}
-              variant="ghost"
-              size="lg"
-              className={cn(
-                CARD_BASE,
-                isMatched ? CARD_DISABLED : CARD_HOVER,
-                isSelected ? CARD_SELECTED : "",
-              )}
-            >
-              {card.kind === "name" ? (
-                <span className="text-lg font-medium">{card.content}</span>
-              ) : card.kind === "upper" ? (
-                <span className="text-2xl">{card.content}</span>
-              ) : (
-                <span className="text-2xl text-lg">{card.content}</span>
-              )}
-            </Button>
-          );
-        })}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* Column: Names */}
+        <div>
+          <div className="mb-2 text-sm font-medium">{LABELS[locale].name}</div>
+          <div className="flex flex-wrap gap-2">
+            {cards
+              .filter((c) => c.kind === "name")
+              .map((card) => {
+                const isSelected = selected.includes(card.id);
+                const isMatched = !!card.matched;
+                return (
+                  <Button
+                    key={card.id}
+                    onClick={() => handleClick(card)}
+                    aria-pressed={isSelected}
+                    disabled={isMatched}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      CARD_BASE,
+                      CARD_DIM,
+                      KIND_STYLES[card.kind],
+                      isMatched ? CARD_DISABLED : CARD_HOVER,
+                      isSelected ? CARD_SELECTED : "",
+                    )}
+                  >
+                    <span className="text-sm font-medium">{card.content}</span>
+                  </Button>
+                );
+              })}
+          </div>
+        </div>
+
+        {/* Column: Upper */}
+        <div>
+          <div className="mb-2 text-sm font-medium">{LABELS[locale].upper}</div>
+          <div className="flex flex-wrap gap-2">
+            {cards
+              .filter((c) => c.kind === "upper")
+              .map((card) => {
+                const isSelected = selected.includes(card.id);
+                const isMatched = !!card.matched;
+                return (
+                  <Button
+                    key={card.id}
+                    onClick={() => handleClick(card)}
+                    aria-pressed={isSelected}
+                    disabled={isMatched}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      CARD_BASE,
+                      CARD_DIM,
+                      KIND_STYLES[card.kind],
+                      isMatched ? CARD_DISABLED : CARD_HOVER,
+                      isSelected ? CARD_SELECTED : "",
+                    )}
+                  >
+                    <span className="text-lg">{card.content}</span>
+                  </Button>
+                );
+              })}
+          </div>
+        </div>
+
+        {/* Column: Lower */}
+        <div>
+          <div className="mb-2 text-sm font-medium">{LABELS[locale].lower}</div>
+          <div className="flex flex-wrap gap-2">
+            {cards
+              .filter((c) => c.kind === "lower")
+              .map((card) => {
+                const isSelected = selected.includes(card.id);
+                const isMatched = !!card.matched;
+                return (
+                  <Button
+                    key={card.id}
+                    onClick={() => handleClick(card)}
+                    aria-pressed={isSelected}
+                    disabled={isMatched}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      CARD_BASE,
+                      CARD_DIM,
+                      KIND_STYLES[card.kind],
+                      isMatched ? CARD_DISABLED : CARD_HOVER,
+                      isSelected ? CARD_SELECTED : "",
+                    )}
+                  >
+                    <span className="text-lg">{card.content}</span>
+                  </Button>
+                );
+              })}
+          </div>
+        </div>
       </div>
     </div>
   );
