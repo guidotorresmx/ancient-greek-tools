@@ -7,6 +7,7 @@
     },
     "matches": "Matches: {matched} / {total}",
     "score": "Score: {score}",
+    "failures": "Failures: {failures}",
     "restart": "Restart",
     "instructions": "Pick one Name, one Upper and one Lower to make a match"
   }

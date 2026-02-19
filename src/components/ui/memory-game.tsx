@@ -68,7 +68,7 @@ export function MemoryGame() {
   }, []);
 
   const [selected, setSelected] = React.useState<string[]>([]);
-  const [score, setScore] = React.useState(0);
+  const [failures, setFailures] = React.useState(0);
 
   const t = useTranslations("memory");
 
@@ -95,7 +95,7 @@ export function MemoryGame() {
     ]);
     setCards(shuffle(list));
     setSelected([]);
-    setScore(0);
+    setFailures(0);
   }
 
   React.useEffect(() => {
@@ -128,11 +128,10 @@ export function MemoryGame() {
           card.keyId === a.keyId ? { ...card, matched: true } : card,
         ),
       );
-      setScore((s) => s + 1);
       const t = setTimeout(() => setSelected([]), 300);
       return () => clearTimeout(t);
     } else {
-      setScore((s) => s - 1);
+      setFailures((f) => f + 1);
       const t = setTimeout(() => setSelected([]), 800);
       return () => clearTimeout(t);
     }
@@ -164,19 +163,22 @@ export function MemoryGame() {
 
   return (
     <div>
-      <div className={STATS_CLASS}>
-        <div className="flex items-baseline gap-3">
-          <div className="font-medium">
-            {t("matches", { matched: matchedCount, total: GREEK.length })}
-          </div>
-          <div className="font-medium">{t("score", { score })}</div>
-          <div className="text-xs text-muted-foreground">
+      <div className={`${STATS_CLASS} justify-between`}>
+        <div className="flex items-center gap-4">
+          <div className="text-sm text-muted-foreground">
             {t("instructions")}
           </div>
         </div>
-        <Button onClick={reset} variant="default" size="sm">
-          {t("restart")}
-        </Button>
+
+        <div className="flex items-center gap-3">
+          <div className="font-medium">
+            {t("matches", { matched: matchedCount, total: GREEK.length })}
+          </div>
+          <div className="font-medium">{t("failures", { failures })}</div>
+          <Button onClick={reset} variant="default" size="sm">
+            {t("restart")}
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
