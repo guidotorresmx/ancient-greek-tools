@@ -19,10 +19,10 @@ export default function Home() {
       color: "bg-blue-500/10 text-blue-500",
     },
     {
-      title: "Editor",
-      description: "Type Ancient Greek with ease using our specialized editor.",
-      icon: <PenTool className="w-6 h-6" />,
-      href: "/editor",
+      title: "Vocabulario",
+      description: "Master the most frequent words in Ancient Greek literature.",
+      icon: <Brain className="w-6 h-6" />,
+      href: "/vocabulario",
       color: "bg-emerald-500/10 text-emerald-500",
     },
     {

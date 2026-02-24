@@ -3,10 +3,26 @@
     "labels": {
       "name": "Nombre",
       "upper": "Mayúscula",
-      "lower": "Minúscula"
+      "lower": "Minúscula",
+      "pronunciation": "Sonido",
+      "transliteration": "ABC"
     },
     "matches": "Correctas: {matched} / {total}",
     "score": "Puntuación: {score}",
-    "restart": "Reiniciar"
+    "failures": "Fallos: {failures}",
+    "restart": "Reiniciar",
+    "instructions": "Elige tres cartas que coincidan para formar un conjunto"
+  },
+  "phonetic": {
+    "instruction": "Escucha la letra y elige su nombre.",
+    "listen": "Escuchar",
+    "correct": "¡Excelente!",
+    "incorrect": "Inténtalo de nuevo"
+  },
+  "vocabulary": {
+    "title": "Palabras Frecuentes",
+    "instruction": "Empareja la palabra griega con su traducción",
+    "select_level": "Nivel de frecuencia",
+    "stats": "Palabras aprendidas: {count}"
   }
 }

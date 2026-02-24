@@ -41,8 +41,7 @@ export function Navbar() {
 
   const NAV_ITEMS = [
     { href: "/letras", label: "Letras" },
-    { href: "/editor", label: "Editor" },
-    { href: "/flashcards", label: "Flashcards" },
+    { href: "/vocabulario", label: "Vocabulario" },
     { href: "/memory", label: "Memory" },
     { href: "/lectura", label: "Lectura" },
   ];

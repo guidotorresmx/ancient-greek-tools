@@ -3,12 +3,26 @@
     "labels": {
       "name": "Name",
       "upper": "Upper",
-      "lower": "Lower"
+      "lower": "Lower",
+      "pronunciation": "Sound",
+      "transliteration": "ABC"
     },
     "matches": "Matches: {matched} / {total}",
     "score": "Score: {score}",
     "failures": "Failures: {failures}",
     "restart": "Restart",
-    "instructions": "Pick one Name, one Upper and one Lower to make a match"
+    "instructions": "Pick three matching cards to make a set"
+  },
+  "phonetic": {
+    "instruction": "Listen to the letter and match its name.",
+    "listen": "Listen",
+    "correct": "Excellent!",
+    "incorrect": "Try again"
+  },
+  "vocabulary": {
+    "title": "Frequent Words",
+    "instruction": "Match the Greek word with its translation",
+    "select_level": "Select frequency level",
+    "stats": "Words learned: {count}"
   }
 }

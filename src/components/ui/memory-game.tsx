@@ -5,42 +5,43 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import Modal from "@/components/ui/modal";
+import { Settings2, RotateCcw } from "lucide-react";
+
+type CardKind = "name" | "upper" | "lower" | "pronunciation" | "transliteration";
 
 type Card = {
   id: string;
   keyId: number;
-  kind: "name" | "upper" | "lower";
-
+  kind: CardKind;
   content: string;
-  revealed?: boolean;
   matched?: boolean;
 };
 
-const GREEK = [
-  ["Alpha", "Α", "α"],
-  ["Beta", "Β", "β"],
-  ["Gamma", "Γ", "γ"],
-  ["Delta", "Δ", "δ"],
-  ["Epsilon", "Ε", "ε"],
-  ["Zeta", "Ζ", "ζ"],
-  ["Eta", "Η", "η"],
-  ["Theta", "Θ", "θ"],
-  ["Iota", "Ι", "ι"],
-  ["Kappa", "Κ", "κ"],
-  ["Lambda", "Λ", "λ"],
-  ["Mu", "Μ", "μ"],
-  ["Nu", "Ν", "ν"],
-  ["Xi", "Ξ", "ξ"],
-  ["Omicron", "Ο", "ο"],
-  ["Pi", "Π", "π"],
-  ["Rho", "Ρ", "ρ"],
-  ["Sigma", "Σ", "σ"],
-  ["Tau", "Τ", "τ"],
-  ["Upsilon", "Υ", "υ"],
-  ["Phi", "Φ", "φ"],
-  ["Chi", "Χ", "χ"],
-  ["Psi", "Ψ", "ψ"],
-  ["Omega", "Ω", "ω"],
+const GREEK_ALPHABET = [
+  { name: "Alpha", upper: "Α", lower: "α", pronunciation: "al-fa", transliteration: "a" },
+  { name: "Beta", upper: "Β", lower: "β", pronunciation: "ve-ta", transliteration: "b" },
+  { name: "Gamma", upper: "Γ", lower: "γ", pronunciation: "gha-ma", transliteration: "g" },
+  { name: "Delta", upper: "Δ", lower: "δ", pronunciation: "thel-ta", transliteration: "d" },
+  { name: "Epsilon", upper: "Ε", lower: "ε", pronunciation: "e-psi-lon", transliteration: "e" },
+  { name: "Zeta", upper: "Ζ", founders: "ζ", pronunciation: "zi-ta", transliteration: "z" },
+  { name: "Eta", upper: "Η", lower: "η", pronunciation: "i-ta", transliteration: "i" },
+  { name: "Theta", upper: "Θ", lower: "θ", pronunciation: "thi-ta", transliteration: "th" },
+  { name: "Iota", upper: "Ι", lower: "ι", pronunciation: "yo-ta", transliteration: "i" },
+  { name: "Kappa", upper: "Κ", lower: "κ", pronunciation: "ka-pa", transliteration: "k" },
+  { name: "Lambda", upper: "Λ", lower: "λ", pronunciation: "lam-tha", transliteration: "l" },
+  { name: "Mu", upper: "Μ", lower: "μ", pronunciation: "mi", transliteration: "m" },
+  { name: "Nu", upper: "Ν", lower: "ν", pronunciation: "ni", transliteration: "n" },
+  { name: "Xi", upper: "Ξ", lower: "ξ", pronunciation: "ksi", transliteration: "x" },
+  { name: "Omicron", upper: "Ο", lower: "ο", pronunciation: "o-mi-kron", transliteration: "o" },
+  { name: "Pi", upper: "Π", lower: "π", pronunciation: "pi", transliteration: "p" },
+  { name: "Rho", upper: "Ρ", lower: "ρ", pronunciation: "ro", transliteration: "r" },
+  { name: "Sigma", upper: "Σ", lower: "σ", pronunciation: "sigh-ma", transliteration: "s" },
+  { name: "Tau", upper: "Τ", lower: "τ", pronunciation: "taf", transliteration: "t" },
+  { name: "Upsilon", upper: "Υ", lower: "υ", pronunciation: "e-ps", transliteration: "y" },
+  { name: "Phi", upper: "Φ", lower: "φ", pronunciation: "fee", transliteration: "ph" },
+  { name: "Chi", upper: "Χ", lower: "χ", pronunciation: "hee", transliteration: "ch" },
+  { name: "Psi", upper: "Ψ", lower: "ψ", pronunciation: "psee", transliteration: "ps" },
+  { name: "Omega", upper: "Ω", lower: "ω", pronunciation: "o-me-gha", transliteration: "o" },
 ];
 
 function shuffle<T>(arr: T[]) {
@@ -53,127 +54,64 @@ function shuffle<T>(arr: T[]) {
 }
 
 export function MemoryGame() {
+  const t = useTranslations("memory");
+  const [activeKinds, setActiveKinds] = React.useState<CardKind[]>(["name", "upper", "lower"]);
+  
   function createList() {
-    return GREEK.flatMap((g, i) => [
-      { id: `${i}-name`, keyId: i, kind: "name", content: g[0] } as Card,
-      { id: `${i}-upper`, keyId: i, kind: "upper", content: g[1] } as Card,
-      { id: `${i}-lower`, keyId: i, kind: "lower", content: g[2] } as Card,
-    ]);
+    return GREEK_ALPHABET.flatMap((g, i) => 
+      activeKinds.map(kind => ({
+        id: `${i}-${kind}`,
+        keyId: i,
+        kind: kind,
+        content: (g as any)[kind]
+      } as Card))
+    );
   }
 
-  // use a deterministic initial order for server render, then shuffle on mount
-  const [cards, setCards] = React.useState<Card[]>(createList);
-
-  React.useEffect(() => {
-    setCards((_) => shuffle(createList()));
-  }, []);
-
+  const [cards, setCards] = React.useState<Card[]>([]);
   const [selected, setSelected] = React.useState<string[]>([]);
   const [failures, setFailures] = React.useState(0);
-  const [showInstructionsModal, setShowInstructionsModal] =
-    React.useState(false);
+  const [showSettings, setShowSettings] = React.useState(false);
 
   React.useEffect(() => {
-    function handler() {
-      setShowInstructionsModal(true);
-    }
-    window.addEventListener("memory:open-instructions", handler);
-    return () =>
-      window.removeEventListener("memory:open-instructions", handler);
-  }, []);
+    setCards(shuffle(createList()));
+  }, [activeKinds]);
 
-  const t = useTranslations("memory");
-
-  const STATS_CLASS =
-    "mb-8 flex items-center gap-4 text-sm font-medium glass p-4 rounded-2xl shadow-sm";
-  const CARD_BASE =
-    "relative rounded-2xl p-2 flex items-center justify-center text-sm border-2 transition-all duration-300";
-  const CARD_DIM = "h-14 w-full sm:w-32";
-  const CARD_HOVER =
-    "hover:shadow-xl hover:-translate-y-1 glass group hover:border-primary/50";
-  const CARD_DISABLED = "opacity-40 pointer-events-none grayscale scale-95";
-  const CARD_SELECTED = "ring-4 ring-primary/30 border-primary scale-105 shadow-xl z-10";
-  const KIND_STYLES: Record<string, string> = {
-    name: "bg-blue-500/5 text-blue-600 dark:text-blue-400 border-blue-500/20",
-    upper: "bg-amber-500/5 text-amber-600 dark:text-amber-400 border-amber-500/20",
-    lower: "bg-emerald-500/5 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-  };
-
-  const ABBR: Record<string, string> = {
-    name: "N",
-    upper: "A",
-    lower: "a",
-  };
-
-  const BADGE_CLASS: Record<string, string> = {
-    name: "bg-blue-600 text-white",
-    upper: "bg-amber-500 text-black",
-    lower: "bg-emerald-600 text-white",
-  };
-
-  function reset() {
-    const list = GREEK.flatMap((g, i) => [
-      { id: `${i}-name`, keyId: i, kind: "name", content: g[0] } as Card,
-      { id: `${i}-upper`, keyId: i, kind: "upper", content: g[1] } as Card,
-      { id: `${i}-lower`, keyId: i, kind: "lower", content: g[2] } as Card,
-    ]);
-    setCards(shuffle(list));
-    setSelected([]);
-    setFailures(0);
-  }
-
-  React.useEffect(() => {
-    // (handled below) placeholder
-  }, [selected, cards]);
-
-  // Avoid re-running the matching logic when `cards` changes (it causes a loop).
-  // Use a ref to always read the latest cards inside an effect that only depends on `selected`.
   const cardsRef = React.useRef<Card[]>(cards);
   React.useEffect(() => {
     cardsRef.current = cards;
   }, [cards]);
 
   React.useEffect(() => {
-    if (selected.length < 3) return;
-    const [aId, bId, cId] = selected;
-    const a = cardsRef.current.find((c) => c.id === aId);
-    const b = cardsRef.current.find((c) => c.id === bId);
-    const c = cardsRef.current.find((c) => c.id === cId);
-    if (!a || !b || !c) return;
+    if (selected.length < activeKinds.length) return;
+    
+    const selectedCards = selected.map(id => cardsRef.current.find(c => c.id === id)).filter(Boolean) as Card[];
+    if (selectedCards.length < activeKinds.length) return;
 
-    const sameKey = a.keyId === b.keyId && b.keyId === c.keyId;
-    const kinds = new Set([a.kind, b.kind, c.kind]);
-    const hasAllKinds =
-      kinds.has("name") && kinds.has("upper") && kinds.has("lower");
+    const firstKey = selectedCards[0].keyId;
+    const sameKey = selectedCards.every(c => c.keyId === firstKey);
+    const allKinds = new Set(selectedCards.map(c => c.kind)).size === activeKinds.length;
 
-    if (sameKey && hasAllKinds) {
-      setCards((prev) =>
-        prev.map((card) =>
-          card.keyId === a.keyId ? { ...card, matched: true } : card,
-        ),
-      );
+    if (sameKey && allKinds) {
+      setCards(prev => prev.map(card => card.keyId === firstKey ? { ...card, matched: true } : card));
       const t = setTimeout(() => setSelected([]), 300);
       return () => clearTimeout(t);
     } else {
-      setFailures((f) => f + 1);
+      setFailures(f => f + 1);
       const t = setTimeout(() => setSelected([]), 800);
       return () => clearTimeout(t);
     }
-  }, [selected]);
+  }, [selected, activeKinds.length]);
 
   function handleClick(card: Card) {
     if (card.matched) return;
     if (selected.includes(card.id)) {
-      setSelected((s) => s.filter((id) => id !== card.id));
+      setSelected(s => s.filter(id => id !== card.id));
       return;
     }
 
-    setSelected((s) => {
-      // replace existing selection from same kind (column) if present
-      const idx = s.findIndex((id) => {
-        const c = cards.find((x) => x.id === id);
-        return c?.kind === card.kind;
-      });
+    setSelected(s => {
+      const idx = s.findIndex(id => cards.find(x => x.id === id)?.kind === card.kind);
       if (idx >= 0) {
         const copy = s.slice();
         copy[idx] = card.id;
@@ -183,135 +121,112 @@ export function MemoryGame() {
     });
   }
 
-  const matchedCount = cards.filter((c) => c.matched).length / 3;
+  function reset() {
+    setCards(shuffle(createList()));
+    setSelected([]);
+    setFailures(0);
+  }
+
+  const matchedCount = cards.filter(c => c.matched).length / activeKinds.length;
 
   return (
-    <div>
-      <div className={`${STATS_CLASS} flex-col gap-2`}>
-        <div className="w-full flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="font-medium">
-              {t("matches", { matched: matchedCount, total: GREEK.length })}
-            </div>
+    <div className="space-y-8">
+      {/* Stats & Controls */}
+      <div className="flex flex-wrap items-center justify-between gap-4 glass p-6 rounded-[2rem] shadow-sm">
+        <div className="flex items-center gap-6">
+          <div className="flex flex-col">
+            <span className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Progress</span>
+            <span className="text-xl font-bold">{matchedCount} / {GREEK_ALPHABET.length}</span>
           </div>
-
-          <div className="flex items-center gap-3">
-            <div className="font-medium">{t("failures", { failures })}</div>
-            <Button onClick={reset} variant="default" size="sm">
-              {t("restart")}
-            </Button>
+          <div className="h-8 w-[1px] bg-border/50" />
+          <div className="flex flex-col">
+            <span className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Failures</span>
+            <span className="text-xl font-bold text-destructive/80">{failures}</span>
           </div>
         </div>
 
-        {/* instructions are shown in a modal triggered from the navbar */}
-        {/* Modal rendered below */}
+        <div className="flex items-center gap-2">
+          <Button onClick={() => setShowSettings(true)} variant="ghost" size="icon" className="rounded-xl">
+            <Settings2 className="w-5 h-5" />
+          </Button>
+          <Button onClick={reset} variant="secondary" className="rounded-xl font-bold gap-2">
+            <RotateCcw className="w-4 h-4" />
+            {t("restart")}
+          </Button>
+        </div>
+      </div>
+
+      {/* Grid */}
+      <div className={cn(
+        "grid gap-6",
+        activeKinds.length <= 3 ? "grid-cols-1 md:grid-cols-3" : "grid-cols-2 md:grid-cols-5"
+      )}>
+        {activeKinds.map(kind => (
+          <div key={kind} className="space-y-4">
+            <div className="flex items-center justify-between px-2">
+              <span className="text-xs uppercase tracking-widest font-bold text-muted-foreground">
+                {t(`labels.${kind}`)}
+              </span>
+            </div>
+            
+            <div className="flex flex-col gap-3">
+              {cards
+                .filter(c => c.kind === kind)
+                .map(card => {
+                  const isSelected = selected.includes(card.id);
+                  const isMatched = !!card.matched;
+                  return (
+                    <Button
+                      key={card.id}
+                      onClick={() => handleClick(card)}
+                      disabled={isMatched}
+                      className={cn(
+                        "h-14 w-full rounded-2xl border-2 transition-all duration-300 font-bold text-lg shadow-sm glass",
+                        isSelected ? "border-primary bg-primary/10 scale-105 shadow-lg z-10" : 
+                        isMatched ? "opacity-20 grayscale scale-95 pointer-events-none border-transparent" : "hover:border-primary/50 hover:-translate-y-1"
+                      )}
+                    >
+                      {card.content}
+                    </Button>
+                  );
+                })}
+            </div>
+          </div>
+        ))}
       </div>
 
       <Modal
-        open={showInstructionsModal}
-        onClose={() => setShowInstructionsModal(false)}
-        title={"How to play"}
+        open={showSettings}
+        onClose={() => setShowSettings(false)}
+        title="Game Settings"
       >
-        <p>{t("instructions")}</p>
+        <div className="space-y-6 py-4">
+          <div className="space-y-4">
+            <label className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Columns to match</label>
+            <div className="grid grid-cols-1 gap-2">
+              {(["name", "upper", "lower", "pronunciation", "transliteration"] as CardKind[]).map(kind => (
+                <Button
+                  key={kind}
+                  variant={activeKinds.includes(kind) ? "default" : "ghost"}
+                  onClick={() => {
+                    if (activeKinds.includes(kind)) {
+                      if (activeKinds.length > 2) setActiveKinds(s => s.filter(k => k !== kind));
+                    } else {
+                      setActiveKinds(s => [...s, kind]);
+                    }
+                  }}
+                  className="justify-start rounded-xl font-bold"
+                >
+                  {t(`labels.${kind}`)}
+                </Button>
+              ))}
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground italic">
+            Note: Selecting more columns makes the game significantly harder!
+          </p>
+        </div>
       </Modal>
-
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Column: Names */}
-        <div>
-          <div className="mb-2 text-sm font-medium">{t("labels.name")}</div>
-          <div className="flex flex-wrap gap-2">
-            {cards
-              .filter((c) => c.kind === "name")
-              .map((card) => {
-                const isSelected = selected.includes(card.id);
-                const isMatched = !!card.matched;
-                return (
-                  <Button
-                    key={card.id}
-                    onClick={() => handleClick(card)}
-                    aria-pressed={isSelected}
-                    disabled={isMatched}
-                    variant="ghost"
-                    size="sm"
-                    className={cn(
-                      CARD_BASE,
-                      CARD_DIM,
-                      KIND_STYLES[card.kind],
-                      isMatched ? CARD_DISABLED : CARD_HOVER,
-                      isSelected ? CARD_SELECTED : "",
-                    )}
-                  >
-                    <span className="text-sm font-medium">{card.content}</span>
-                  </Button>
-                );
-              })}
-          </div>
-        </div>
-
-        {/* Column: Upper */}
-        <div>
-          <div className="mb-2 text-sm font-medium">{t("labels.upper")}</div>
-          <div className="flex flex-wrap gap-2">
-            {cards
-              .filter((c) => c.kind === "upper")
-              .map((card) => {
-                const isSelected = selected.includes(card.id);
-                const isMatched = !!card.matched;
-                return (
-                  <Button
-                    key={card.id}
-                    onClick={() => handleClick(card)}
-                    aria-pressed={isSelected}
-                    disabled={isMatched}
-                    variant="ghost"
-                    size="sm"
-                    className={cn(
-                      CARD_BASE,
-                      CARD_DIM,
-                      KIND_STYLES[card.kind],
-                      isMatched ? CARD_DISABLED : CARD_HOVER,
-                      isSelected ? CARD_SELECTED : "",
-                    )}
-                  >
-                    <span className="text-lg">{card.content}</span>
-                  </Button>
-                );
-              })}
-          </div>
-        </div>
-
-        {/* Column: Lower */}
-        <div>
-          <div className="mb-2 text-sm font-medium">{t("labels.lower")}</div>
-          <div className="flex flex-wrap gap-2">
-            {cards
-              .filter((c) => c.kind === "lower")
-              .map((card) => {
-                const isSelected = selected.includes(card.id);
-                const isMatched = !!card.matched;
-                return (
-                  <Button
-                    key={card.id}
-                    onClick={() => handleClick(card)}
-                    aria-pressed={isSelected}
-                    disabled={isMatched}
-                    variant="ghost"
-                    size="sm"
-                    className={cn(
-                      CARD_BASE,
-                      CARD_DIM,
-                      KIND_STYLES[card.kind],
-                      isMatched ? CARD_DISABLED : CARD_HOVER,
-                      isSelected ? CARD_SELECTED : "",
-                    )}
-                  >
-                    <span className="text-lg">{card.content}</span>
-                  </Button>
-                );
-              })}
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
