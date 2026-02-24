@@ -170,7 +170,7 @@ export function VocabularyGame() {
             variant="ghost"
             disabled={feedback === "correct"}
             className={cn(
-              "h-24 glass rounded-[2rem] text-3xl font-bold border-2 transition-all duration-300",
+              "h-24 glass rounded-[2rem] text-3xl font-bold border-2 transition-all duration-300 text-foreground",
               feedback === "correct" && option.greek === target.greek ? "border-emerald-500 bg-emerald-500 text-white shadow-xl shadow-emerald-500/20" :
               "hover:border-primary/50 hover:bg-primary/5 hover:-translate-y-1 active:scale-95"
             )}

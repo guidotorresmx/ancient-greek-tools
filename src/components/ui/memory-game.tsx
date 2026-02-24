@@ -181,9 +181,9 @@ export function MemoryGame() {
                       onClick={() => handleClick(card)}
                       disabled={isMatched}
                       className={cn(
-                        "h-14 w-full rounded-2xl border-2 transition-all duration-300 font-bold text-lg shadow-sm glass",
+                        "h-14 w-full rounded-2xl border-2 transition-all duration-300 font-bold text-lg shadow-sm glass text-foreground",
                         isSelected ? "border-primary bg-primary/10 scale-105 shadow-lg z-10" : 
-                        isMatched ? "opacity-20 grayscale scale-95 pointer-events-none border-transparent" : "hover:border-primary/50 hover:-translate-y-1"
+                        isMatched ? "opacity-50 grayscale scale-95 pointer-events-none border-border/50 bg-background/50" : "hover:border-primary/50 hover:-translate-y-1"
                       )}
                     >
                       {card.content}

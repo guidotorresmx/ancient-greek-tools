@@ -104,7 +104,7 @@ export function ReadingGame() {
                   "text-5xl md:text-7xl font-bold transition-all duration-300 select-none",
                   activeWordIdx === idx 
                     ? "text-primary scale-125 translate-y-[-10px]" 
-                    : "text-foreground/80 group-hover:text-primary/60"
+                    : "text-foreground group-hover:text-primary/70"
                 )}
               >
                 {word.greek}
@@ -114,7 +114,7 @@ export function ReadingGame() {
                   "mt-4 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-500",
                   activeWordIdx === idx 
                     ? "bg-primary text-primary-foreground opacity-100 translate-y-0" 
-                    : "bg-accent/50 text-muted-foreground opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0"
+                    : "bg-accent/80 text-foreground opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0"
                 )}
               >
                 {word.trans}
@@ -125,7 +125,7 @@ export function ReadingGame() {
 
         {/* Full Translation */}
         <div className="absolute bottom-12 left-0 right-0 px-8 text-center animate-in slide-in-from-bottom-4 duration-700">
-          <p className="text-xl italic text-muted-foreground font-medium">
+          <p className="text-xl italic text-foreground font-semibold">
             "{sentence.translation}"
           </p>
         </div>

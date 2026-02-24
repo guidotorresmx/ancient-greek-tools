@@ -161,7 +161,7 @@ export function PhoneticGame() {
             variant="ghost"
             disabled={feedback === "correct"}
             className={cn(
-              "h-24 glass rounded-[2rem] text-2xl font-bold border-2 transition-all duration-300",
+              "h-24 glass rounded-[2rem] text-2xl font-bold border-2 transition-all duration-300 text-foreground",
               feedback === "correct" && option.id === target.id ? "border-emerald-500 bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" :
               feedback === "incorrect" && option.id !== target.id ? "opacity-50" :
               "hover:border-primary/50 hover:bg-primary/5 hover:-translate-y-1"
