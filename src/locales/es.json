@@ -1,28 +1,127 @@
 {
+  "common": {
+    "nav": {
+      "letras": "Letras",
+      "vocabulario": "Vocabulario",
+      "memory": "Memoria",
+      "lectura": "Lectura",
+      "home": "Herramientas y Recursos"
+    },
+    "ui": {
+      "instructions": "Instrucciones",
+      "close": "Cerrar",
+      "language": "Idioma",
+      "theme": "Cambiar Tema",
+      "try_now": "Probar ahora",
+      "master_language": "Domina el lenguaje de",
+      "philosophers_poets": "Filósofos y Poetas",
+      "hero_desc": "Una suite de herramientas modernas diseñadas para ayudarte a aprender, leer y escribir griego antiguo con precisión y belleza.",
+      "get_started": "Empezar",
+      "explore_tools": "Explorar herramientas"
+    }
+  },
+  "pages": {
+    "home": {
+      "letras": {
+        "title": "Letras",
+        "desc": "Domina el alfabeto griego antiguo con ejercicios interactivos."
+      },
+      "vocabulario": {
+        "title": "Vocabulario",
+        "desc": "Domina las palabras más frecuentes de la literatura griega antigua."
+      },
+      "memory": {
+        "title": "Memoria",
+        "desc": "Empareja letras, nombres y símbolos en este juego clásico."
+      },
+      "lectura": {
+        "title": "Lectura",
+        "desc": "Practica la lectura de textos clásicos con herramientas interactivas."
+      }
+    },
+    "letras": {
+      "title": "Letras y Sonidos",
+      "desc": "Entrena tu oído para reconocer los sonidos del alfabeto griego clásico. Escucha atentamente y selecciona la letra correcta."
+    },
+    "vocabulario": {
+      "title": "Vocabulario Frecuente",
+      "desc": "Domina los pilares del griego antiguo aprendiendo las palabras más comunes de la literatura clásica."
+    },
+    "lectura": {
+      "title": "Lectura Interactiva",
+      "desc": "Mejora tus habilidades de lectura y audición con el asistente palabra por palabra.",
+      "ui": {
+        "header": "Lectura Interactiva",
+        "subheader": "Oraciones Clásicas",
+        "next": "Siguiente Oración",
+        "tip": "Consejo: Pasa el cursor sobre las palabras para ver sus traducciones individuales."
+      },
+      "sentences": [
+        {
+          "translation": "Al principio existía la Palabra.",
+          "words": [
+            { "greek": "Ἐν", "trans": "En", "duration": 400 },
+            { "greek": "ἀρχῇ", "trans": "el principio", "duration": 600 },
+            { "greek": "ἦν", "trans": "era/existía", "duration": 400 },
+            { "greek": "ὁ", "trans": "la", "duration": 300 },
+            { "greek": "Λόγος", "trans": "Palabra", "duration": 700 }
+          ]
+        },
+        {
+          "translation": "Las cosas bellas son difíciles.",
+          "words": [
+            { "greek": "Χαλεπὰ", "trans": "Difíciles", "duration": 600 },
+            { "greek": "τὰ", "trans": "las [cosas]", "duration": 300 },
+            { "greek": "καλά", "trans": "bellas", "duration": 600 }
+          ]
+        },
+        {
+          "translation": "Conócete a ti mismo.",
+          "words": [
+            { "greek": "Γνῶθι", "trans": "Conoce", "duration": 600 },
+            { "greek": "σεαυτόν", "trans": "a ti mismo", "duration": 700 }
+          ]
+        }
+      ]
+    },
+    "memory": {
+      "title": "Memoria Clásica",
+      "desc": "Empareja letras, nombres y símbolos en este juego clásico. Selecciona uno de cada categoría para formar un conjunto."
+    }
+  },
   "memory": {
     "labels": {
       "name": "Nombre",
       "upper": "Mayúscula",
       "lower": "Minúscula",
-      "pronunciation": "Sonido",
-      "transliteration": "ABC"
+      "pronunciation": "Pronunciación",
+      "transliteration": "Transliteración"
     },
-    "matches": "Correctas: {matched} / {total}",
-    "score": "Puntuación: {score}",
-    "failures": "Fallos: {failures}",
+    "matches": "Aciertos",
+    "score": "Puntuación",
+    "failures": "Fallos",
+    "progress": "Progreso",
     "restart": "Reiniciar",
-    "instructions": "Elige tres cartas que coincidan para formar un conjunto"
+    "settings": {
+      "title": "Configuración",
+      "columns": "Columnas a Emparejar",
+      "difficult_note": "Nota: ¡Seleccionar más columnas hace el juego significativamente más difícil!"
+    },
+    "instructions": "Elige uno de cada categoría para formar un conjunto"
   },
   "phonetic": {
-    "instruction": "Escucha la letra y elige su nombre.",
+    "score": "Puntuación",
+    "streak": "Racha",
     "listen": "Escuchar",
+    "instruction": "Escucha el sonido y elige la letra correcta",
     "correct": "¡Excelente!",
     "incorrect": "Inténtalo de nuevo"
   },
   "vocabulary": {
-    "title": "Palabras Frecuentes",
+    "top": "Top {level}",
+    "translate": "Traducir",
+    "reset": "Reiniciar",
     "instruction": "Empareja la palabra griega con su traducción",
-    "select_level": "Nivel de frecuencia",
-    "stats": "Palabras aprendidas: {count}"
+    "title": "Palabras Frecuentes"
   }
 }

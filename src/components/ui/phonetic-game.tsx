@@ -49,19 +49,23 @@ function shuffle<T>(arr: T[]) {
   return a;
 }
 
+import { useLanguage } from "@/components/language-provider";
+
 export function PhoneticGame() {
+  const { locale } = useLanguage();
   const t = useTranslations("phonetic");
   const [target, setTarget] = React.useState<Phoneme | null>(null);
   const [options, setOptions] = React.useState<Phoneme[]>([]);
-  const [feedback, setFeedback] = React.useState<"correct" | "incorrect" | null>(null);
+  const [feedback, setFeedback] = React.useState<
+    "correct" | "incorrect" | null
+  >(null);
   const [score, setScore] = React.useState(0);
   const [streak, setStreak] = React.useState(0);
-  const [isSpanish, setIsSpanish] = React.useState(false);
 
   const nextRound = React.useCallback(() => {
     const shuffled = shuffle(GREEK_PHONEMES);
     const correct = shuffled[0];
-    const pool = shuffle(GREEK_PHONEMES.filter(p => p.id !== correct.id));
+    const pool = shuffle(GREEK_PHONEMES.filter((p) => p.id !== correct.id));
     const roundOptions = shuffle([correct, ...pool.slice(0, 3)]);
 
     setTarget(correct);
@@ -87,8 +91,8 @@ export function PhoneticGame() {
 
     if (id === target.id) {
       setFeedback("correct");
-      setScore(s => s + 1);
-      setStreak(s => s + 1);
+      setScore((s) => s + 1);
+      setStreak((s) => s + 1);
       speak(target.char);
       setTimeout(nextRound, 1500);
     } else {
@@ -106,24 +110,34 @@ export function PhoneticGame() {
       <div className="flex items-center justify-between glass p-4 rounded-2xl">
         <div className="flex items-center gap-4">
           <div className="flex flex-col">
-            <span className="text-xs uppercase tracking-widest text-muted-foreground font-bold">Score</span>
+            <span className="text-xs uppercase tracking-widest text-muted-foreground font-bold">
+              {t("score")}
+            </span>
             <span className="text-2xl font-bold text-primary">{score}</span>
           </div>
           <div className="h-8 w-[1px] bg-border/50" />
           <div className="flex flex-col">
-            <span className="text-xs uppercase tracking-widest text-muted-foreground font-bold">Streak</span>
+            <span className="text-xs uppercase tracking-widest text-muted-foreground font-bold">
+              {t("streak")}
+            </span>
             <span className="text-2xl font-bold flex items-center gap-1">
-              {streak} {streak > 4 && <Sparkles className="w-4 h-4 text-amber-500" />}
+              {streak}{" "}
+              {streak > 4 && <Sparkles className="w-4 h-4 text-amber-500" />}
             </span>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 bg-accent/50 p-1 rounded-xl mr-2">
-            <Button onClick={() => setIsSpanish(false)} variant={!isSpanish ? "secondary" : "ghost"} size="sm" className="h-7 px-3 rounded-lg text-xs font-bold">EN</Button>
-            <Button onClick={() => setIsSpanish(true)} variant={isSpanish ? "secondary" : "ghost"} size="sm" className="h-7 px-3 rounded-lg text-xs font-bold">ES</Button>
-          </div>
-          <Button onClick={() => { setScore(0); setStreak(0); nextRound(); }} variant="ghost" size="icon" className="rounded-xl">
+          <Button
+            onClick={() => {
+              setScore(0);
+              setStreak(0);
+              nextRound();
+            }}
+            variant="ghost"
+            size="icon"
+            className="rounded-xl"
+          >
             <RotateCcw className="w-5 h-5" />
           </Button>
         </div>
@@ -131,18 +145,22 @@ export function PhoneticGame() {
 
       {/* Target Section */}
       <div className="relative group">
-        <div className={cn(
-          "glass p-16 rounded-[3rem] flex flex-col items-center justify-center transition-all duration-500 border-2",
-          feedback === "correct" ? "border-emerald-500/50 bg-emerald-500/5" : 
-          feedback === "incorrect" ? "border-destructive/50 bg-destructive/5 animate-bounce" : 
-          "border-primary/20"
-        )}>
+        <div
+          className={cn(
+            "glass p-16 rounded-[3rem] flex flex-col items-center justify-center transition-all duration-500 border-2",
+            feedback === "correct"
+              ? "border-emerald-500/50 bg-emerald-500/5"
+              : feedback === "incorrect"
+                ? "border-destructive/50 bg-destructive/5 animate-bounce"
+                : "border-primary/20",
+          )}
+        >
           <span className="text-[12rem] font-bold text-primary leading-none select-none group-hover:scale-110 transition-transform duration-500">
             {target.char}
           </span>
-          <Button 
-            variant="ghost" 
-            size="lg" 
+          <Button
+            variant="ghost"
+            size="lg"
             className="mt-8 rounded-2xl gap-2 text-primary font-bold hover:bg-primary/10 px-8 py-6 text-lg"
             onClick={() => speak(target.char)}
           >
@@ -162,12 +180,16 @@ export function PhoneticGame() {
             disabled={feedback === "correct"}
             className={cn(
               "h-24 glass rounded-[2rem] text-2xl font-bold border-2 transition-all duration-300 text-foreground",
-              feedback === "correct" && option.id === target.id ? "border-emerald-500 bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" :
-              feedback === "incorrect" && option.id !== target.id ? "opacity-50" :
-              "hover:border-primary/50 hover:bg-primary/5 hover:-translate-y-1"
+              feedback === "correct" && option.id === target.id
+                ? "border-emerald-500 bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                : feedback === "incorrect" && option.id !== target.id
+                  ? "opacity-50"
+                  : "hover:border-primary/50 hover:bg-primary/5 hover:-translate-y-1",
             )}
           >
-            {isSpanish ? ESPANOL_NOMBRES[option.id] || option.name : option.name}
+            {locale === "es"
+              ? ESPANOL_NOMBRES[option.id] || option.name
+              : option.name}
           </Button>
         ))}
       </div>

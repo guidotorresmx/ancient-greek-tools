@@ -1,21 +1,22 @@
-import { PhoneticGame } from "@/components/ui/phonetic-game";
+"use client";
 
-export const metadata = {
-  title: "Letras & Sonidos — Ancient Greek Tools",
-  description: "Learn to recognize Ancient Greek letters and their sounds.",
-};
+import { PhoneticGame } from "@/components/ui/phonetic-game";
+import { useTranslations } from "next-intl";
 
 export default function LetrasPage() {
+  const t = useTranslations("pages.letras");
+
   return (
     <div className="flex flex-col items-center gap-12">
       <div className="text-center space-y-4">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Letras & Sonidos</h1>
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+          {t("title")}
+        </h1>
         <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-          Train your ear to recognize the sounds of the classical Greek alphabet.
-          Listen carefully and select the correct letter.
+          {t("desc")}
         </p>
       </div>
-      
+
       <PhoneticGame />
     </div>
   );

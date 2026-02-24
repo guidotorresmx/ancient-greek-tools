@@ -45,32 +45,42 @@ const SENTENCES: Sentence[] = [
       { greek: "σεαυτόν", trans: "yourself", duration: 700 },
     ],
     translation: "Know thyself.",
-  }
+  },
 ];
 
+import { useTranslations } from "next-intl";
+
 export function ReadingGame() {
+  const t = useTranslations("pages.lectura");
   const [currentSentenceIdx, setCurrentSentenceIdx] = React.useState(0);
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [activeWordIdx, setActiveWordIdx] = React.useState<number | null>(null);
-  
-  const sentence = SENTENCES[currentSentenceIdx];
+
+  // Get sentences from translations
+  // Note: We access them as a raw object/array if next-intl supports it,
+  // but usually it's better to type them or use a specific structure.
+  // We'll use the JSON structure we just defined.
+  const sentences = t.raw("sentences") as any[];
+  const sentence = sentences[currentSentenceIdx];
 
   const playSentence = async () => {
     if (isPlaying) return;
     setIsPlaying(true);
 
-    for (let i = 0; i < sentence.greek.length; i++) {
+    for (let i = 0; i < sentence.words.length; i++) {
       setActiveWordIdx(i);
-      
+
       // Speak the word
       if ("speechSynthesis" in window) {
-        const utterance = new SpeechSynthesisUtterance(sentence.greek[i].greek);
+        const utterance = new SpeechSynthesisUtterance(sentence.words[i].greek);
         utterance.lang = "el-GR";
         utterance.rate = 0.6;
         window.speechSynthesis.speak(utterance);
       }
 
-      await new Promise(resolve => setTimeout(resolve, sentence.greek[i].duration + 200));
+      await new Promise((resolve) =>
+        setTimeout(resolve, sentence.words[i].duration + 200),
+      );
     }
 
     setActiveWordIdx(null);
@@ -78,7 +88,7 @@ export function ReadingGame() {
   };
 
   const nextSentence = () => {
-    setCurrentSentenceIdx((prev) => (prev + 1) % SENTENCES.length);
+    setCurrentSentenceIdx((prev) => (prev + 1) % sentences.length);
     setActiveWordIdx(null);
     setIsPlaying(false);
   };
@@ -89,32 +99,35 @@ export function ReadingGame() {
       <div className="text-center space-y-4">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest">
           <BookOpen className="w-4 h-4" />
-          Interactive Reading
+          {t("ui.header")}
         </div>
-        <h2 className="text-2xl font-bold">Classical Sentences</h2>
+        <h2 className="text-2xl font-bold">{t("ui.subheader")}</h2>
       </div>
 
       {/* Main Display */}
       <div className="relative glass p-12 md:p-20 rounded-[3rem] border-2 border-primary/20 shadow-2xl flex flex-col items-center justify-center min-h-[400px]">
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-12">
-          {sentence.greek.map((word, idx) => (
-            <div key={idx} className="flex flex-col items-center group cursor-default">
-              <span 
+          {sentence.words.map((word: any, idx: number) => (
+            <div
+              key={idx}
+              className="flex flex-col items-center group cursor-default"
+            >
+              <span
                 className={cn(
                   "text-5xl md:text-7xl font-bold transition-all duration-300 select-none",
-                  activeWordIdx === idx 
-                    ? "text-primary scale-125 translate-y-[-10px]" 
-                    : "text-foreground group-hover:text-primary/70"
+                  activeWordIdx === idx
+                    ? "text-primary scale-125 translate-y-[-10px]"
+                    : "text-foreground group-hover:text-primary/70",
                 )}
               >
                 {word.greek}
               </span>
-              <div 
+              <div
                 className={cn(
                   "mt-4 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-500",
-                  activeWordIdx === idx 
-                    ? "bg-primary text-primary-foreground opacity-100 translate-y-0" 
-                    : "bg-accent/80 text-foreground opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0"
+                  activeWordIdx === idx
+                    ? "bg-primary text-primary-foreground opacity-100 translate-y-0"
+                    : "bg-accent/80 text-foreground opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0",
                 )}
               >
                 {word.trans}
@@ -152,7 +165,11 @@ export function ReadingGame() {
           size="lg"
           className="h-20 w-20 rounded-full shadow-2xl shadow-primary/30 hover:scale-110 active:scale-95 transition-all text-white"
         >
-          {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8 fill-current" />}
+          {isPlaying ? (
+            <Pause className="w-8 h-8" />
+          ) : (
+            <Play className="w-8 h-8 fill-current" />
+          )}
         </Button>
 
         <Button
@@ -161,12 +178,12 @@ export function ReadingGame() {
           size="lg"
           className="h-14 px-8 rounded-2xl font-bold border-2 border-primary/20 hover:border-primary/50"
         >
-          Next Sentence
+          {t("ui.next")}
         </Button>
       </div>
 
       <p className="text-center text-muted-foreground text-sm font-medium italic">
-        Tip: Hover over words to see their individual translations.
+        {t("ui.tip")}
       </p>
     </div>
   );

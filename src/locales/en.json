@@ -1,28 +1,127 @@
 {
+  "common": {
+    "nav": {
+      "letras": "Letters",
+      "vocabulario": "Vocabulary",
+      "memory": "Memory",
+      "lectura": "Reading",
+      "home": "Tools & Resources"
+    },
+    "ui": {
+      "instructions": "Instructions",
+      "close": "Close",
+      "language": "Language",
+      "theme": "Toggle Theme",
+      "try_now": "Try Now",
+      "master_language": "Master the Language of",
+      "philosophers_poets": "Philosophers & Poets",
+      "hero_desc": "A suite of modern tools designed to help you learn, read, and write Ancient Greek with precision and beauty.",
+      "get_started": "Get Started",
+      "explore_tools": "Explore Tools"
+    }
+  },
+  "pages": {
+    "home": {
+      "letras": {
+        "title": "Letters",
+        "desc": "Master the Ancient Greek alphabet with interactive drills."
+      },
+      "vocabulario": {
+        "title": "Vocabulary",
+        "desc": "Master the most frequent words in Ancient Greek literature."
+      },
+      "memory": {
+        "title": "Memory",
+        "desc": "Match letters, names, and symbols in this classical game."
+      },
+      "lectura": {
+        "title": "Reading",
+        "desc": "Practice reading classical texts with interactive assistant tools."
+      }
+    },
+    "letras": {
+      "title": "Letters & Sounds",
+      "desc": "Train your ear to recognize the sounds of the classical Greek alphabet. Listen carefully and select the correct letter."
+    },
+    "vocabulario": {
+      "title": "Frequent Vocabulary",
+      "desc": "Master the building blocks of Ancient Greek by learning the most common words found in classical literature."
+    },
+    "lectura": {
+      "title": "Interactive Reading",
+      "desc": "Improve your reading and listening skills with word-by-word assistant.",
+      "ui": {
+        "header": "Interactive Reading",
+        "subheader": "Classical Sentences",
+        "next": "Next Sentence",
+        "tip": "Tip: Hover over words to see their individual translations."
+      },
+      "sentences": [
+        {
+          "translation": "In the beginning was the Word.",
+          "words": [
+            { "greek": "Ἐν", "trans": "In", "duration": 400 },
+            { "greek": "ἀρχῇ", "trans": "beginning", "duration": 600 },
+            { "greek": "ἦν", "trans": "was", "duration": 400 },
+            { "greek": "ὁ", "trans": "the", "duration": 300 },
+            { "greek": "Λόγος", "trans": "Word", "duration": 700 }
+          ]
+        },
+        {
+          "translation": "Fine things are difficult.",
+          "words": [
+            { "greek": "Χαλεπὰ", "trans": "Difficult", "duration": 600 },
+            { "greek": "τὰ", "trans": "the [things]", "duration": 300 },
+            { "greek": "καλά", "trans": "beautiful", "duration": 600 }
+          ]
+        },
+        {
+          "translation": "Know thyself.",
+          "words": [
+            { "greek": "Γνῶθι", "trans": "Know", "duration": 600 },
+            { "greek": "σεαυτόν", "trans": "yourself", "duration": 700 }
+          ]
+        }
+      ]
+    },
+    "memory": {
+      "title": "Classical Memory",
+      "desc": "Match letters, names, and symbols in this classical game. Select one of each category to make a full set."
+    }
+  },
   "memory": {
     "labels": {
       "name": "Name",
       "upper": "Upper",
       "lower": "Lower",
-      "pronunciation": "Sound",
-      "transliteration": "ABC"
+      "pronunciation": "Pronunciation",
+      "transliteration": "Transliteration"
     },
-    "matches": "Matches: {matched} / {total}",
-    "score": "Score: {score}",
-    "failures": "Failures: {failures}",
+    "matches": "Matches",
+    "score": "Score",
+    "failures": "Failures",
+    "progress": "Progress",
     "restart": "Restart",
-    "instructions": "Pick three matching cards to make a set"
+    "settings": {
+      "title": "Game Settings",
+      "columns": "Columns to Match",
+      "difficult_note": "Note: Selecting more columns makes the game significantly harder!"
+    },
+    "instructions": "Pick one of each category to make a set"
   },
   "phonetic": {
-    "instruction": "Listen to the letter and match its name.",
+    "score": "Score",
+    "streak": "Streak",
     "listen": "Listen",
+    "instruction": "Listen to the sound and pick the correct letter",
     "correct": "Excellent!",
     "incorrect": "Try again"
   },
   "vocabulary": {
-    "title": "Frequent Words",
+    "top": "Top {level}",
+    "translate": "Translate",
+    "reset": "Reset Score",
     "instruction": "Match the Greek word with its translation",
-    "select_level": "Select frequency level",
-    "stats": "Words learned: {count}"
+    "title": "Frequent Words"
   }
 }

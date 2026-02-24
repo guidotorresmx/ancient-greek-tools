@@ -54,20 +54,26 @@ function shuffle<T>(arr: T[]) {
   return a;
 }
 
+import { useLanguage } from "@/components/language-provider";
+
 export function VocabularyGame() {
+  const { locale } = useLanguage();
   const t = useTranslations("vocabulary");
   const [level, setLevel] = React.useState(10);
   const [target, setTarget] = React.useState<Word | null>(null);
   const [options, setOptions] = React.useState<Word[]>([]);
-  const [feedback, setFeedback] = React.useState<"correct" | "incorrect" | null>(null);
+  const [feedback, setFeedback] = React.useState<
+    "correct" | "incorrect" | null
+  >(null);
   const [score, setScore] = React.useState(0);
-  const [isSpanish, setIsSpanish] = React.useState(false);
 
   const nextRound = React.useCallback(() => {
     const pool = VOCAB_DATA.slice(0, level);
     const shuffled = shuffle(pool);
     const correct = shuffled[0];
-    const wrongOnes = shuffle(pool.filter(w => w.greek !== correct.greek)).slice(0, 3);
+    const wrongOnes = shuffle(
+      pool.filter((w) => w.greek !== correct.greek),
+    ).slice(0, 3);
     const roundOptions = shuffle([correct, ...wrongOnes]);
 
     setTarget(correct);
@@ -84,7 +90,7 @@ export function VocabularyGame() {
 
     if (greek === target.greek) {
       setFeedback("correct");
-      setScore(s => s + 1);
+      setScore((s) => s + 1);
       setTimeout(nextRound, 1200);
     } else {
       setFeedback("incorrect");
@@ -107,27 +113,9 @@ export function VocabularyGame() {
               size="sm"
               className="rounded-xl font-bold"
             >
-              Top {l}
+              {t("top", { level: l })}
             </Button>
           ))}
-        </div>
-        <div className="flex items-center gap-2 bg-accent/50 p-1 rounded-xl">
-          <Button
-            onClick={() => setIsSpanish(false)}
-            variant={!isSpanish ? "secondary" : "ghost"}
-            size="sm"
-            className="rounded-lg text-xs"
-          >
-            EN
-          </Button>
-          <Button
-            onClick={() => setIsSpanish(true)}
-            variant={isSpanish ? "secondary" : "ghost"}
-            size="sm"
-            className="rounded-lg text-xs"
-          >
-            ES
-          </Button>
         </div>
       </div>
 
@@ -139,19 +127,25 @@ export function VocabularyGame() {
         <div className="absolute top-4 right-4 text-2xl font-bold text-primary">
           {score}
         </div>
-        
+
         <div className="text-center space-y-2">
-          <span className="text-sm uppercase tracking-widest text-muted-foreground font-bold">Translate</span>
+          <span className="text-sm uppercase tracking-widest text-muted-foreground font-bold">
+            {t("translate")}
+          </span>
           <h2 className="text-6xl font-bold text-foreground">
-            {isSpanish ? target.es : target.en}
+            {locale === "es" ? target.es : target.en}
           </h2>
         </div>
 
         {feedback && (
-          <div className={cn(
-            "absolute inset-0 flex items-center justify-center backdrop-blur-md transition-all duration-300",
-            feedback === "correct" ? "bg-emerald-500/20" : "bg-destructive/20"
-          )}>
+          <div
+            className={cn(
+              "absolute inset-0 flex items-center justify-center backdrop-blur-md transition-all duration-300",
+              feedback === "correct"
+                ? "bg-emerald-500/20"
+                : "bg-destructive/20",
+            )}
+          >
             {feedback === "correct" ? (
               <CheckCircle2 className="w-24 h-24 text-emerald-500 animate-in zoom-in duration-300" />
             ) : (
@@ -171,8 +165,9 @@ export function VocabularyGame() {
             disabled={feedback === "correct"}
             className={cn(
               "h-24 glass rounded-[2rem] text-3xl font-bold border-2 transition-all duration-300 text-foreground",
-              feedback === "correct" && option.greek === target.greek ? "border-emerald-500 bg-emerald-500 text-white shadow-xl shadow-emerald-500/20" :
-              "hover:border-primary/50 hover:bg-primary/5 hover:-translate-y-1 active:scale-95"
+              feedback === "correct" && option.greek === target.greek
+                ? "border-emerald-500 bg-emerald-500 text-white shadow-xl shadow-emerald-500/20"
+                : "hover:border-primary/50 hover:bg-primary/5 hover:-translate-y-1 active:scale-95",
             )}
           >
             {option.greek}
@@ -181,15 +176,22 @@ export function VocabularyGame() {
       </div>
 
       <div className="flex justify-center">
-        <Button 
-          variant="ghost" 
-          onClick={() => { setScore(0); nextRound(); }}
+        <Button
+          variant="ghost"
+          onClick={() => {
+            setScore(0);
+            nextRound();
+          }}
           className="gap-2 text-muted-foreground hover:text-foreground"
         >
           <RotateCcw className="w-4 h-4" />
-          Reset Score
+          {t("reset")}
         </Button>
       </div>
+
+      <p className="text-center text-muted-foreground text-sm font-medium italic">
+        {t("instruction")}
+      </p>
     </div>
   );
 }

@@ -1,21 +1,22 @@
-import { VocabularyGame } from "@/components/ui/vocabulary-game";
+"use client";
 
-export const metadata = {
-  title: "Vocabulario Frecuente — Ancient Greek Tools",
-  description: "Learn the most frequent words in Ancient Greek.",
-};
+import { VocabularyGame } from "@/components/ui/vocabulary-game";
+import { useTranslations } from "next-intl";
 
 export default function VocabularyPage() {
+  const t = useTranslations("pages.vocabulario");
+
   return (
     <div className="flex flex-col items-center gap-12">
       <div className="text-center space-y-4">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Vocabulario Frecuente</h1>
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+          {t("title")}
+        </h1>
         <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-          Master the building blocks of Ancient Greek by learning the most common words 
-          found in classical literature.
+          {t("desc")}
         </p>
       </div>
-      
+
       <VocabularyGame />
     </div>
   );
