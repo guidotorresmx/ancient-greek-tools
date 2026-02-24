@@ -85,19 +85,18 @@ export function MemoryGame() {
   const t = useTranslations("memory");
 
   const STATS_CLASS =
-    "mb-4 flex items-center gap-4 text-sm text-muted-foreground bg-card/50 p-3 rounded-md";
-  const GRID_CLASS = "grid grid-cols-3 sm:grid-cols-6 gap-3";
+    "mb-8 flex items-center gap-4 text-sm font-medium glass p-4 rounded-2xl shadow-sm";
   const CARD_BASE =
-    "relative rounded-md p-2 flex items-center justify-center text-sm border transition-all";
-  const CARD_DIM = "h-12 w-28 sm:w-32";
+    "relative rounded-2xl p-2 flex items-center justify-center text-sm border-2 transition-all duration-300";
+  const CARD_DIM = "h-14 w-full sm:w-32";
   const CARD_HOVER =
-    "hover:shadow-lg hover:-translate-y-0.5 bg-white/90 dark:bg-white/5";
-  const CARD_DISABLED = "opacity-60 pointer-events-none grayscale";
-  const CARD_SELECTED = "ring-2 ring-primary/80 scale-105";
+    "hover:shadow-xl hover:-translate-y-1 glass group hover:border-primary/50";
+  const CARD_DISABLED = "opacity-40 pointer-events-none grayscale scale-95";
+  const CARD_SELECTED = "ring-4 ring-primary/30 border-primary scale-105 shadow-xl z-10";
   const KIND_STYLES: Record<string, string> = {
-    name: "bg-blue-50 dark:bg-blue-900",
-    upper: "bg-yellow-50 dark:bg-yellow-900",
-    lower: "bg-green-50 dark:bg-green-900",
+    name: "bg-blue-500/5 text-blue-600 dark:text-blue-400 border-blue-500/20",
+    upper: "bg-amber-500/5 text-amber-600 dark:text-amber-400 border-amber-500/20",
+    lower: "bg-emerald-500/5 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
   };
 
   const ABBR: Record<string, string> = {

@@ -32,7 +32,9 @@ export default function RootLayout({
       >
         <NextIntlClientProvider locale="en" messages={enMessages as any}>
           <Navbar />
-          <main className="p-8">{children}</main>
+          <main className="max-w-7xl mx-auto px-4 pt-32 pb-20">
+            {children}
+          </main>
         </NextIntlClientProvider>
       </body>
     </html>
