@@ -4,6 +4,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
+import Modal from "@/components/ui/modal";
 
 type Card = {
   id: string;
@@ -69,22 +70,46 @@ export function MemoryGame() {
 
   const [selected, setSelected] = React.useState<string[]>([]);
   const [failures, setFailures] = React.useState(0);
+  const [showInstructionsModal, setShowInstructionsModal] =
+    React.useState(false);
+
+  React.useEffect(() => {
+    function handler() {
+      setShowInstructionsModal(true);
+    }
+    window.addEventListener("memory:open-instructions", handler);
+    return () =>
+      window.removeEventListener("memory:open-instructions", handler);
+  }, []);
 
   const t = useTranslations("memory");
 
   const STATS_CLASS =
-    "mb-4 flex items-center gap-4 text-sm text-muted-foreground";
+    "mb-4 flex items-center gap-4 text-sm text-muted-foreground bg-card/50 p-3 rounded-md";
   const GRID_CLASS = "grid grid-cols-3 sm:grid-cols-6 gap-3";
   const CARD_BASE =
-    "relative rounded-md p-2 flex items-center justify-center text-sm";
-  const CARD_DIM = "h-12 w-28";
-  const CARD_HOVER = "hover:shadow-md bg-white/80";
-  const CARD_DISABLED = "opacity-50 pointer-events-none";
-  const CARD_SELECTED = "ring-2 ring-primary animate-pop";
+    "relative rounded-md p-2 flex items-center justify-center text-sm border transition-all";
+  const CARD_DIM = "h-12 w-28 sm:w-32";
+  const CARD_HOVER =
+    "hover:shadow-lg hover:-translate-y-0.5 bg-white/90 dark:bg-white/5";
+  const CARD_DISABLED = "opacity-60 pointer-events-none grayscale";
+  const CARD_SELECTED = "ring-2 ring-primary/80 scale-105";
   const KIND_STYLES: Record<string, string> = {
     name: "bg-blue-50 dark:bg-blue-900",
     upper: "bg-yellow-50 dark:bg-yellow-900",
     lower: "bg-green-50 dark:bg-green-900",
+  };
+
+  const ABBR: Record<string, string> = {
+    name: "N",
+    upper: "A",
+    lower: "a",
+  };
+
+  const BADGE_CLASS: Record<string, string> = {
+    name: "bg-blue-600 text-white",
+    upper: "bg-amber-500 text-black",
+    lower: "bg-emerald-600 text-white",
   };
 
   function reset() {
@@ -163,23 +188,33 @@ export function MemoryGame() {
 
   return (
     <div>
-      <div className={`${STATS_CLASS} justify-between`}>
-        <div className="flex items-center gap-4">
-          <div className="text-sm text-muted-foreground">
-            {t("instructions")}
+      <div className={`${STATS_CLASS} flex-col gap-2`}>
+        <div className="w-full flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="font-medium">
+              {t("matches", { matched: matchedCount, total: GREEK.length })}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="font-medium">{t("failures", { failures })}</div>
+            <Button onClick={reset} variant="default" size="sm">
+              {t("restart")}
+            </Button>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="font-medium">
-            {t("matches", { matched: matchedCount, total: GREEK.length })}
-          </div>
-          <div className="font-medium">{t("failures", { failures })}</div>
-          <Button onClick={reset} variant="default" size="sm">
-            {t("restart")}
-          </Button>
-        </div>
+        {/* instructions are shown in a modal triggered from the navbar */}
+        {/* Modal rendered below */}
       </div>
+
+      <Modal
+        open={showInstructionsModal}
+        onClose={() => setShowInstructionsModal(false)}
+        title={"How to play"}
+      >
+        <p>{t("instructions")}</p>
+      </Modal>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Column: Names */}
