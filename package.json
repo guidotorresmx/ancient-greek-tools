@@ -6,7 +6,8 @@
     "dev": "bun --bun next dev --turbo",
     "build": "bun --bun next build",
     "start": "bun --bun next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "validate-locales": "bun scripts/validate-locales.ts"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
