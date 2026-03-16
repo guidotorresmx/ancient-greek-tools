@@ -5,7 +5,8 @@
       "vocabulario": "Vocabulary",
       "memory": "Memory",
       "lectura": "Reading",
-      "home": "Tools & Resources"
+      "home": "Tools",
+      "title": "Learn Ancient Greek"
     },
     "ui": {
       "instructions": "Instructions",
@@ -110,6 +111,7 @@
     "instructions": "Pick one of each category to make a set"
   },
   "phonetic": {
+    "title": "Greek Letters",
     "score": "Score",
     "streak": "Streak",
     "listen": "Listen",

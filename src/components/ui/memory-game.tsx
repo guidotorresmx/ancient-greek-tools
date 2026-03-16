@@ -191,7 +191,13 @@ const GREEK_ALPHABET = [
     pronunciation: "o-me-gha",
     transliteration: "o",
   },
-];
+].map((g) => ({
+  name: g.name.normalize("NFC"),
+  upper: g.upper.normalize("NFC"),
+  lower: g.lower.normalize("NFC"),
+  pronunciation: g.pronunciation.normalize("NFC"),
+  transliteration: g.transliteration.normalize("NFC"),
+}));
 
 function shuffle<T>(arr: T[]) {
   const a = arr.slice();
@@ -202,13 +208,21 @@ function shuffle<T>(arr: T[]) {
   return a;
 }
 
+import { useGame } from "@/components/game-provider";
+
 export function MemoryGame() {
+  const { setScore: setGlobalScore, setGameName, setStats, setOnReset, setActions } = useGame();
   const t = useTranslations("memory");
   const [activeKinds, setActiveKinds] = React.useState<CardKind[]>([
     "name",
     "upper",
     "lower",
   ]);
+
+  const [cards, setCards] = React.useState<Card[]>([]);
+  const [selected, setSelected] = React.useState<string[]>([]);
+  const [failures, setFailures] = React.useState(0);
+  const [showSettings, setShowSettings] = React.useState(false);
 
   function createList() {
     return GREEK_ALPHABET.flatMap((g, i) =>
@@ -224,10 +238,41 @@ export function MemoryGame() {
     );
   }
 
-  const [cards, setCards] = React.useState<Card[]>([]);
-  const [selected, setSelected] = React.useState<string[]>([]);
-  const [failures, setFailures] = React.useState(0);
-  const [showSettings, setShowSettings] = React.useState(false);
+  React.useEffect(() => {
+    setGameName(t("title") || "Memory Game");
+    return () => setGameName("");
+  }, [setGameName, t]);
+
+  const matchedCount =
+    cards.filter((c) => c.matched).length / activeKinds.length;
+
+  React.useEffect(() => {
+    setGlobalScore(matchedCount);
+    setStats({ [t("failures")]: failures });
+  }, [matchedCount, failures, setGlobalScore, setStats, t]);
+
+  const speak = React.useCallback(
+    (text: string, kind: CardKind, keyId: number) => {
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text.normalize("NFC"));
+
+        // If it's a Greek character or pronunciation, use Greek voice
+        if (kind === "upper" || kind === "lower" || kind === "pronunciation") {
+          utterance.lang = "el-GR";
+        } else {
+          // For 'name' it could be English or Spanish depending on locale
+          // but letter names are similar. Let's stick to el-GR for consistency if it sounds better,
+          // or the browser default.
+          utterance.lang = "el-GR";
+        }
+
+        utterance.rate = 0.8;
+        window.speechSynthesis.speak(utterance);
+      }
+    },
+    [],
+  );
 
   React.useEffect(() => {
     setCards(shuffle(createList()));
@@ -286,77 +331,58 @@ export function MemoryGame() {
     });
   }
 
-  function reset() {
+  function handleReset() {
     setCards(shuffle(createList()));
     setSelected([]);
     setFailures(0);
   }
 
-  const matchedCount =
-    cards.filter((c) => c.matched).length / activeKinds.length;
+  React.useEffect(() => {
+    setOnReset(() => handleReset);
+    return () => setOnReset(undefined);
+  }, [setOnReset]);
+
+  React.useEffect(() => {
+    setActions(
+      <Button
+        onClick={() => setShowSettings(true)}
+        variant="ghost"
+        size="sm"
+        className="h-8 rounded-lg gap-2 font-bold px-2 md:px-3 text-[10px] md:text-xs"
+      >
+        <Settings2 className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
+        <span className="hidden sm:inline">{t("settings.title")}</span>
+      </Button>
+    );
+    return () => setActions(null);
+  }, [setActions, t]);
 
   return (
-    <div className="space-y-8">
-      {/* Stats & Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-4 glass p-6 rounded-[2rem] shadow-sm">
-        <div className="flex items-center gap-6">
-          <div className="flex flex-col">
-            <span className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">
-              {t("progress")}
-            </span>
-            <span className="text-xl font-bold">
-              {matchedCount} / {GREEK_ALPHABET.length}
-            </span>
-          </div>
-          <div className="h-8 w-[1px] bg-border/50" />
-          <div className="flex flex-col">
-            <span className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">
-              {t("failures")}
-            </span>
-            <span className="text-xl font-bold text-destructive/80">
-              {failures}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={() => setShowSettings(true)}
-            variant="ghost"
-            size="icon"
-            className="rounded-xl"
-          >
-            <Settings2 className="w-5 h-5" />
-          </Button>
-          <Button
-            onClick={reset}
-            variant="secondary"
-            className="rounded-xl font-bold gap-2"
-          >
-            <RotateCcw className="w-4 h-4" />
-            {t("restart")}
-          </Button>
-        </div>
-      </div>
+    <div className="space-y-4 md:space-y-6 w-full max-w-5xl mx-auto">
+      <div className="hidden" />
 
       {/* Grid */}
       <div
         className={cn(
-          "grid gap-6",
-          activeKinds.length <= 3
-            ? "grid-cols-1 md:grid-cols-3"
-            : "grid-cols-2 md:grid-cols-5",
+          "grid gap-3 md:gap-4 font-sans",
+          activeKinds.length === 1
+            ? "grid-cols-1"
+            : activeKinds.length === 2
+              ? "grid-cols-2"
+              : activeKinds.length === 3
+                ? "grid-cols-2 md:grid-cols-3"
+                : "grid-cols-2 md:grid-cols-5",
         )}
       >
         {activeKinds.map((kind) => (
-          <div key={kind} className="space-y-4">
-            <div className="flex items-center justify-between px-2">
-              <span className="text-xs uppercase tracking-widest font-bold text-muted-foreground">
+          <div key={kind} className="space-y-3 md:space-y-4">
+            <div className="flex items-center justify-between px-1 md:px-2">
+              <span className="hud-label">
                 {t(`labels.${kind}`)}
               </span>
             </div>
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2 md:gap-3">
               {cards
                 .filter((c) => c.kind === kind)
                 .map((card) => {
@@ -365,15 +391,17 @@ export function MemoryGame() {
                   return (
                     <Button
                       key={card.id}
-                      onClick={() => handleClick(card)}
+                      onClick={() => {
+                        handleClick(card);
+                      }}
                       disabled={isMatched}
                       className={cn(
-                        "h-14 w-full rounded-2xl border-2 transition-all duration-300 font-bold text-lg shadow-sm glass text-foreground",
+                        "game-option h-10 md:h-14 text-sm md:text-lg rounded-lg md:rounded-xl",
                         isSelected
                           ? "border-primary bg-primary/10 scale-105 shadow-lg z-10"
                           : isMatched
-                            ? "opacity-50 grayscale scale-95 pointer-events-none border-border/50 bg-background/50"
-                            : "hover:border-primary/50 hover:-translate-y-1",
+                            ? "opacity-30 grayscale scale-95 pointer-events-none border-border/50 bg-background/50"
+                            : "",
                       )}
                     >
                       {card.content}
@@ -410,7 +438,7 @@ export function MemoryGame() {
                   variant={activeKinds.includes(kind) ? "default" : "ghost"}
                   onClick={() => {
                     if (activeKinds.includes(kind)) {
-                      if (activeKinds.length > 2)
+                      if (activeKinds.length > 1)
                         setActiveKinds((s) => s.filter((k) => k !== kind));
                     } else {
                       setActiveKinds((s) => [...s, kind]);
@@ -428,10 +456,6 @@ export function MemoryGame() {
           </p>
         </div>
       </Modal>
-
-      <p className="text-center text-muted-foreground text-sm font-medium italic mt-8">
-        {t("instructions")}
-      </p>
     </div>
   );
 }

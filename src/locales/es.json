@@ -5,7 +5,8 @@
       "vocabulario": "Vocabulario",
       "memory": "Memoria",
       "lectura": "Lectura",
-      "home": "Herramientas y Recursos"
+      "home": "Herramientas",
+      "title": "Aprende Griego Antiguo"
     },
     "ui": {
       "instructions": "Instrucciones",
@@ -110,6 +111,7 @@
     "instructions": "Elige uno de cada categoría para formar un conjunto"
   },
   "phonetic": {
+    "title": "Letras Griegas",
     "score": "Puntuación",
     "streak": "Racha",
     "listen": "Escuchar",

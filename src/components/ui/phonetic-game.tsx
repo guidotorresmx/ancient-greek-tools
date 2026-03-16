@@ -30,7 +30,7 @@ const GREEK_PHONEMES: Phoneme[] = [
   { id: "xi", char: "ξ", name: "Xi" },
   { id: "omicron", char: "ο", name: "Omicron" },
   { id: "pi", char: "π", name: "Pi" },
-  { id: "rho", char: "rho", name: "ρ" },
+  { id: "rho", char: "ρ", name: "Rho" },
   { id: "sigma", char: "σ", name: "Sigma" },
   { id: "tau", char: "τ", name: "Tau" },
   { id: "upsilon", char: "υ", name: "Upsilon" },
@@ -38,7 +38,11 @@ const GREEK_PHONEMES: Phoneme[] = [
   { id: "chi", char: "χ", name: "Chi" },
   { id: "psi", char: "ψ", name: "Psi" },
   { id: "omega", char: "ω", name: "Omega" },
-];
+].map((p) => ({
+  ...p,
+  char: p.char.normalize("NFC"),
+  name: p.name.normalize("NFC"),
+}));
 
 function shuffle<T>(arr: T[]) {
   const a = arr.slice();
@@ -50,9 +54,11 @@ function shuffle<T>(arr: T[]) {
 }
 
 import { useLanguage } from "@/components/language-provider";
+import { useGame } from "@/components/game-provider";
 
 export function PhoneticGame() {
   const { locale } = useLanguage();
+  const { setScore: setGlobalScore, setGameName, setStats, setOnReset } = useGame();
   const t = useTranslations("phonetic");
   const [target, setTarget] = React.useState<Phoneme | null>(null);
   const [options, setOptions] = React.useState<Phoneme[]>([]);
@@ -73,13 +79,33 @@ export function PhoneticGame() {
     setFeedback(null);
   }, []);
 
+  const handleReset = React.useCallback(() => {
+    setScore(0);
+    setStreak(0);
+    nextRound();
+  }, [nextRound]);
+
+  React.useEffect(() => {
+    setOnReset(() => handleReset);
+    return () => setOnReset(undefined);
+  }, [handleReset, setOnReset]);
+
+  React.useEffect(() => {
+    setGameName(t("title") || "Letters Game");
+    return () => setGameName("");
+  }, [setGameName, t]);
+
+  React.useEffect(() => {
+    setStats({ [t("streak")]: streak });
+  }, [streak, setStats, t]);
+
   React.useEffect(() => {
     nextRound();
   }, [nextRound]);
 
   function speak(char: string) {
     if ("speechSynthesis" in window) {
-      const utterance = new SpeechSynthesisUtterance(char);
+      const utterance = new SpeechSynthesisUtterance(char.normalize("NFC"));
       utterance.lang = "el-GR";
       utterance.rate = 0.7;
       window.speechSynthesis.speak(utterance);
@@ -105,73 +131,37 @@ export function PhoneticGame() {
   if (!target) return null;
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-8 animate-in fade-in duration-700">
-      {/* HUD */}
-      <div className="flex items-center justify-between glass p-4 rounded-2xl">
-        <div className="flex items-center gap-4">
-          <div className="flex flex-col">
-            <span className="text-xs uppercase tracking-widest text-muted-foreground font-bold">
-              {t("score")}
-            </span>
-            <span className="text-2xl font-bold text-primary">{score}</span>
-          </div>
-          <div className="h-8 w-[1px] bg-border/50" />
-          <div className="flex flex-col">
-            <span className="text-xs uppercase tracking-widest text-muted-foreground font-bold">
-              {t("streak")}
-            </span>
-            <span className="text-2xl font-bold flex items-center gap-1">
-              {streak}{" "}
-              {streak > 4 && <Sparkles className="w-4 h-4 text-amber-500" />}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={() => {
-              setScore(0);
-              setStreak(0);
-              nextRound();
-            }}
-            variant="ghost"
-            size="icon"
-            className="rounded-xl"
-          >
-            <RotateCcw className="w-5 h-5" />
-          </Button>
-        </div>
-      </div>
+    <div className="game-container">
+      <div className="hidden" />
 
       {/* Target Section */}
       <div className="relative group">
         <div
           className={cn(
-            "glass p-16 rounded-[3rem] flex flex-col items-center justify-center transition-all duration-500 border-2",
+            "game-card",
             feedback === "correct"
               ? "border-emerald-500/50 bg-emerald-500/5"
               : feedback === "incorrect"
                 ? "border-destructive/50 bg-destructive/5 animate-bounce"
-                : "border-primary/20",
+                : "",
           )}
         >
-          <span className="text-[12rem] font-bold text-primary leading-none select-none group-hover:scale-110 transition-transform duration-500">
+          <span className="text-[6rem] md:text-[10rem] font-bold text-primary leading-none select-none group-hover:scale-105 transition-transform duration-500">
             {target.char}
           </span>
           <Button
             variant="ghost"
-            size="lg"
-            className="mt-8 rounded-2xl gap-2 text-primary font-bold hover:bg-primary/10 px-8 py-6 text-lg"
+            size="sm"
+            className="mt-2 md:mt-4 rounded-xl md:rounded-2xl gap-2 text-primary font-bold hover:bg-primary/10 px-4 py-2 md:px-6 md:py-4 text-sm md:text-base h-auto"
             onClick={() => speak(target.char)}
           >
-            <Volume2 className="w-6 h-6" />
+            <Volume2 className="w-4 h-4 md:w-5 md:h-5" />
             {t("listen")}
           </Button>
         </div>
       </div>
 
-      {/* Options Grid */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-2 md:gap-4">
         {options.map((option) => (
           <Button
             key={option.id}
@@ -179,12 +169,12 @@ export function PhoneticGame() {
             variant="ghost"
             disabled={feedback === "correct"}
             className={cn(
-              "h-24 glass rounded-[2rem] text-2xl font-bold border-2 transition-all duration-300 text-foreground",
+              "game-option",
               feedback === "correct" && option.id === target.id
-                ? "border-emerald-500 bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                ? "game-option-correct"
                 : feedback === "incorrect" && option.id !== target.id
                   ? "opacity-50"
-                  : "hover:border-primary/50 hover:bg-primary/5 hover:-translate-y-1",
+                  : "",
             )}
           >
             {locale === "es"
@@ -193,10 +183,6 @@ export function PhoneticGame() {
           </Button>
         ))}
       </div>
-
-      <p className="text-center text-muted-foreground text-sm font-medium">
-        {t("instruction")}
-      </p>
     </div>
   );
 }

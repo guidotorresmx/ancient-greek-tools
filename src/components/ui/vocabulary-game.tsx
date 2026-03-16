@@ -3,7 +3,13 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { CheckCircle2, XCircle, RotateCcw, Trophy } from "lucide-react";
+import {
+  CheckCircle2,
+  XCircle,
+  RotateCcw,
+  Trophy,
+  Volume2,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 
 type Word = {
@@ -43,7 +49,7 @@ const VOCAB_DATA: Word[] = [
   { greek: "ἔχω", en: "to have, hold", es: "tener" },
   { greek: "δίδωμι", en: "to give", es: "dar" },
   { greek: "πολύς", en: "much, many", es: "mucho" },
-];
+].map((w) => ({ ...w, greek: w.greek.normalize("NFC") }));
 
 function shuffle<T>(arr: T[]) {
   const a = arr.slice();
@@ -55,10 +61,13 @@ function shuffle<T>(arr: T[]) {
 }
 
 import { useLanguage } from "@/components/language-provider";
+import { useGame } from "@/components/game-provider";
 
 export function VocabularyGame() {
   const { locale } = useLanguage();
+  const { setScore: setGlobalScore, setGameName, setActions, setOnReset } = useGame();
   const t = useTranslations("vocabulary");
+
   const [level, setLevel] = React.useState(10);
   const [target, setTarget] = React.useState<Word | null>(null);
   const [options, setOptions] = React.useState<Word[]>([]);
@@ -66,6 +75,25 @@ export function VocabularyGame() {
     "correct" | "incorrect" | null
   >(null);
   const [score, setScore] = React.useState(0);
+
+  React.useEffect(() => {
+    setGameName(t("title"));
+    return () => setGameName("");
+  }, [setGameName, t]);
+
+  React.useEffect(() => {
+    setGlobalScore(score);
+  }, [score, setGlobalScore]);
+
+  const speak = (text: string) => {
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text.normalize("NFC"));
+      utterance.lang = "el-GR";
+      utterance.rate = 0.7;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
 
   const nextRound = React.useCallback(() => {
     const pool = VOCAB_DATA.slice(0, level);
@@ -85,13 +113,44 @@ export function VocabularyGame() {
     nextRound();
   }, [nextRound]);
 
+  const handleReset = React.useCallback(() => {
+    setScore(0);
+    nextRound();
+  }, [nextRound]);
+
+  React.useEffect(() => {
+    setOnReset(() => handleReset);
+    return () => setOnReset(undefined);
+  }, [handleReset, setOnReset]);
+
+  React.useEffect(() => {
+    setActions(
+      <div className="flex items-center gap-1.5">
+        {[10, 20, 30].map((l) => (
+          <Button
+            key={l}
+            onClick={() => setLevel(l)}
+            variant={level === l ? "secondary" : "ghost"}
+            size="sm"
+            className="h-7 md:h-8 rounded-lg font-bold text-[9px] md:text-[10px] px-1.5 md:px-2"
+          >
+            <span className="hidden sm:inline-block mr-0.5">Top</span>
+            {l}
+          </Button>
+        ))}
+      </div>
+    );
+    return () => setActions(null);
+  }, [level, setActions, t]);
+
   function handleChoice(greek: string) {
     if (feedback || !target) return;
 
     if (greek === target.greek) {
       setFeedback("correct");
       setScore((s) => s + 1);
-      setTimeout(nextRound, 1200);
+      speak(target.greek);
+      setTimeout(nextRound, 1500);
     } else {
       setFeedback("incorrect");
       setTimeout(() => setFeedback(null), 800);
@@ -101,38 +160,16 @@ export function VocabularyGame() {
   if (!target) return null;
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-8 animate-in fade-in duration-700">
-      {/* Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-4 glass p-4 rounded-2xl">
-        <div className="flex items-center gap-2">
-          {[10, 20, 30].map((l) => (
-            <Button
-              key={l}
-              onClick={() => setLevel(l)}
-              variant={level === l ? "default" : "ghost"}
-              size="sm"
-              className="rounded-xl font-bold"
-            >
-              {t("top", { level: l })}
-            </Button>
-          ))}
-        </div>
-      </div>
+    <div className="game-container">
+      <div className="hidden" />
 
       {/* Target Word */}
-      <div className="relative glass p-16 rounded-[2.5rem] flex flex-col items-center justify-center border-2 border-primary/20 overflow-hidden group">
-        <div className="absolute top-4 left-4">
-          <Trophy className="w-8 h-8 text-primary shadow-lg" />
-        </div>
-        <div className="absolute top-4 right-4 text-2xl font-bold text-primary">
-          {score}
-        </div>
-
-        <div className="text-center space-y-2">
-          <span className="text-sm uppercase tracking-widest text-muted-foreground font-bold">
+      <div className="game-card min-h-[140px] md:min-h-[180px]">
+        <div className="text-center space-y-1">
+          <span className="hud-label leading-none">
             {t("translate")}
           </span>
-          <h2 className="text-6xl font-bold text-foreground">
+          <h2 className="text-3xl md:text-5xl font-bold text-foreground">
             {locale === "es" ? target.es : target.en}
           </h2>
         </div>
@@ -147,51 +184,45 @@ export function VocabularyGame() {
             )}
           >
             {feedback === "correct" ? (
-              <CheckCircle2 className="w-24 h-24 text-emerald-500 animate-in zoom-in duration-300" />
+              <CheckCircle2 className="w-16 h-16 md:w-24 md:h-24 text-emerald-500 animate-in zoom-in duration-300" />
             ) : (
-              <XCircle className="w-24 h-24 text-destructive animate-in zoom-in duration-300" />
+              <XCircle className="w-16 h-16 md:w-24 md:h-24 text-destructive animate-in zoom-in duration-300" />
             )}
           </div>
         )}
       </div>
 
       {/* Options Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-4">
         {options.map((option) => (
-          <Button
-            key={option.greek}
-            onClick={() => handleChoice(option.greek)}
-            variant="ghost"
-            disabled={feedback === "correct"}
-            className={cn(
-              "h-24 glass rounded-[2rem] text-3xl font-bold border-2 transition-all duration-300 text-foreground",
-              feedback === "correct" && option.greek === target.greek
-                ? "border-emerald-500 bg-emerald-500 text-white shadow-xl shadow-emerald-500/20"
-                : "hover:border-primary/50 hover:bg-primary/5 hover:-translate-y-1 active:scale-95",
-            )}
-          >
-            {option.greek}
-          </Button>
+          <div key={option.greek} className="group relative">
+            <Button
+              onClick={() => handleChoice(option.greek)}
+              variant="ghost"
+              disabled={feedback === "correct"}
+              className={cn(
+                "game-option",
+                feedback === "correct" && option.greek === target.greek
+                  ? "game-option-correct"
+                  : "",
+              )}
+            >
+              {option.greek}
+            </Button>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                speak(option.greek);
+              }}
+              variant="ghost"
+              size="icon"
+              className="absolute top-1 right-1 md:top-2 md:right-2 w-6 h-6 md:w-8 md:h-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <Volume2 className="w-3 h-3 md:w-4 md:h-4 text-muted-foreground" />
+            </Button>
+          </div>
         ))}
       </div>
-
-      <div className="flex justify-center">
-        <Button
-          variant="ghost"
-          onClick={() => {
-            setScore(0);
-            nextRound();
-          }}
-          className="gap-2 text-muted-foreground hover:text-foreground"
-        >
-          <RotateCcw className="w-4 h-4" />
-          {t("reset")}
-        </Button>
-      </div>
-
-      <p className="text-center text-muted-foreground text-sm font-medium italic">
-        {t("instruction")}
-      </p>
     </div>
   );
 }

@@ -40,5 +40,9 @@ export type Messages = Record<string, any>;
 export default async function request(request: Request) {
   const locale = await getLocale(request);
   const messages = await getMessages(locale);
-  return { locale, messages };
+  return { 
+    locale, 
+    messages,
+    timeZone: 'Europe/Madrid' // You can adjust this to your preferred global default
+  };
 }
