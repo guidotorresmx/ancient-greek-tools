@@ -64,6 +64,8 @@ export function Navbar() {
   const NAV_ITEMS = [
     { href: "/letras", label: t("nav.letras") },
     { href: "/vocabulario", label: t("nav.vocabulario") },
+    { href: "/declinaciones", label: t("nav.declinaciones") },
+    { href: "/verbos", label: t("nav.verbos") },
     { href: "/memory", label: t("nav.memory") },
     { href: "/lectura", label: t("nav.lectura") },
   ];
@@ -77,10 +79,10 @@ export function Navbar() {
     >
       <nav
         className={cn(
-          "max-w-6xl mx-auto rounded-2xl transition-all duration-300 border border-transparent",
+          "max-w-6xl mx-auto rounded-2xl transition-all duration-300 border",
           scrolled || isGameMode
             ? "glass shadow-xl py-2 px-4 border-border/40"
-            : "py-4 px-2",
+            : "py-4 px-2 border-transparent",
         )}
       >
         <div className="flex items-center justify-between relative">

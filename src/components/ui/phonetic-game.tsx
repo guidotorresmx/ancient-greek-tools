@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Volume2, RotateCcw, Sparkles } from "lucide-react";
+import { Volume2, RotateCcw, Sparkles, CheckCircle2, XCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 type Phoneme = {
@@ -56,10 +56,13 @@ function shuffle<T>(arr: T[]) {
 import { useLanguage } from "@/components/language-provider";
 import { useGame } from "@/components/game-provider";
 
+import { playSuccessSound, playErrorSound } from "@/lib/audio";
+
 export function PhoneticGame() {
   const { locale } = useLanguage();
   const { setScore: setGlobalScore, setGameName, setStats, setOnReset } = useGame();
   const t = useTranslations("phonetic");
+  const uiT = useTranslations("common.ui");
   const [target, setTarget] = React.useState<Phoneme | null>(null);
   const [options, setOptions] = React.useState<Phoneme[]>([]);
   const [feedback, setFeedback] = React.useState<
@@ -119,16 +122,25 @@ export function PhoneticGame() {
       setFeedback("correct");
       setScore((s) => s + 1);
       setStreak((s) => s + 1);
+      playSuccessSound();
       speak(target.char);
       setTimeout(nextRound, 1500);
     } else {
       setFeedback("incorrect");
+      playErrorSound();
       setStreak(0);
-      setTimeout(() => setFeedback(null), 1000);
+      setTimeout(() => {
+        setFeedback(null);
+        nextRound();
+      }, 2500);
     }
   }
 
   if (!target) return null;
+
+  const correctValue = locale === "es"
+    ? ESPANOL_NOMBRES[target.id] || target.name
+    : target.name;
 
   return (
     <div className="game-container">
@@ -138,11 +150,11 @@ export function PhoneticGame() {
       <div className="relative group">
         <div
           className={cn(
-            "game-card",
+            "game-card relative overflow-hidden",
             feedback === "correct"
               ? "border-emerald-500/50 bg-emerald-500/5"
               : feedback === "incorrect"
-                ? "border-destructive/50 bg-destructive/5 animate-bounce"
+                ? "border-destructive/50 bg-destructive/5"
                 : "",
           )}
         >
@@ -158,6 +170,27 @@ export function PhoneticGame() {
             <Volume2 className="w-4 h-4 md:w-5 md:h-5" />
             {t("listen")}
           </Button>
+
+          {feedback && (
+            <div
+              className={cn(
+                "absolute inset-0 flex flex-col items-center justify-center backdrop-blur-md transition-all duration-300",
+                feedback === "correct" ? "bg-emerald-500/20" : "bg-destructive/20",
+              )}
+            >
+              {feedback === "correct" ? (
+                <CheckCircle2 className="w-20 h-20 text-emerald-500 animate-in zoom-in duration-300" />
+              ) : (
+                <>
+                  <XCircle className="w-20 h-20 text-destructive animate-in zoom-in duration-300" />
+                  <div className="mt-4 text-center animate-in slide-in-from-bottom-2 duration-500">
+                    <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{uiT("correct_answer")}</span>
+                    <div className="text-xl font-bold text-emerald-500">{correctValue}</div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -167,14 +200,16 @@ export function PhoneticGame() {
             key={option.id}
             onClick={() => handleChoice(option.id)}
             variant="ghost"
-            disabled={feedback === "correct"}
+            disabled={!!feedback}
             className={cn(
-              "game-option",
+              "game-option transition-all duration-300",
               feedback === "correct" && option.id === target.id
                 ? "game-option-correct"
-                : feedback === "incorrect" && option.id !== target.id
-                  ? "opacity-50"
-                  : "",
+                : feedback === "incorrect" && option.id === target.id
+                  ? "border-emerald-500 bg-emerald-500/10 scale-105 shadow-md z-10"
+                  : feedback === "incorrect" && option.id !== target.id
+                    ? "opacity-30 grayscale"
+                    : "",
             )}
           >
             {locale === "es"

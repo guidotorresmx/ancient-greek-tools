@@ -3,6 +3,8 @@
     "nav": {
       "letras": "Letters",
       "vocabulario": "Vocabulary",
+      "declinaciones": "Declinations",
+      "verbos": "Verbs",
       "memory": "Memory",
       "lectura": "Reading",
       "home": "Tools",
@@ -18,7 +20,10 @@
       "philosophers_poets": "Philosophers & Poets",
       "hero_desc": "A suite of modern tools designed to help you learn, read, and write Ancient Greek with precision and beauty.",
       "get_started": "Get Started",
-      "explore_tools": "Explore Tools"
+      "explore_tools": "Explore Tools",
+      "game": "Game",
+      "study": "Study",
+      "correct_answer": "Correct Answer"
     }
   },
   "pages": {
@@ -30,6 +35,14 @@
       "vocabulario": {
         "title": "Vocabulary",
         "desc": "Master the most frequent words in Ancient Greek literature."
+      },
+      "declinaciones": {
+        "title": "Declinations",
+        "desc": "Practice noun and adjective forms."
+      },
+      "verbos": {
+        "title": "Verbs",
+        "desc": "Master Ancient Greek conjugation paradigms."
       },
       "memory": {
         "title": "Memory",
@@ -88,10 +101,20 @@
     "memory": {
       "title": "Classical Memory",
       "desc": "Match letters, names, and symbols in this classical game. Select one of each category to make a full set."
+    },
+    "declinaciones": {
+      "title": "Noun Declinations",
+      "desc": "Practice the various forms of Ancient Greek nouns and adjectives."
+    },
+    "verbos": {
+      "title": "Verb Conjugation",
+      "desc": "Master the complex rules of Ancient Greek verbs."
     }
   },
   "memory": {
     "labels": {
+      "greek": "Greek",
+      "translation": "Translation",
       "name": "Name",
       "upper": "Upper",
       "lower": "Lower",
@@ -109,6 +132,89 @@
       "difficult_note": "Note: Selecting more columns makes the game significantly harder!"
     },
     "instructions": "Pick one of each category to make a set"
+  },
+  "declinations": {
+    "title": "Declinations",
+    "cases": {
+      "nominative": "Nominative",
+      "genitive": "Genitive",
+      "dative": "Dative",
+      "accusative": "Accusative",
+      "vocative": "Vocative"
+    },
+    "hints": {
+      "nominative": "The [word]",
+      "genitive": "of the [word]",
+      "dative": "to/for the [word]",
+      "accusative": "the [word] (obj.)",
+      "vocative": "O [word]!"
+    },
+    "usage": {
+      "nominative": "Subject",
+      "genitive": "Possession",
+      "dative": "Indirect Object",
+      "accusative": "Direct Object",
+      "vocative": "Addressing"
+    },
+    "numbers": {
+      "singular": "Singular",
+      "plural": "Plural"
+    },
+    "genders": {
+      "masculine": "Masculine",
+      "feminine": "Feminine",
+      "neuter": "Neuter"
+    },
+    "ui": {
+      "case": "Case"
+    },
+    "labels": {
+      "noun": "Noun"
+    }
+  },
+  "verbs": {
+    "title": "Verb Conjugation",
+    "tenses": {
+      "present": "Present",
+      "imperfect": "Imperfect",
+      "future": "Future",
+      "aorist": "Aorist",
+      "perfect": "Perfect",
+      "pluperfect": "Pluperfect",
+      "future_perfect": "Future Perfect"
+    },
+    "moods": {
+      "indicative": "Indicative",
+      "imperative": "Imperative",
+      "subjunctive": "Subjunctive",
+      "optative": "Optative",
+      "infinitive": "Infinitive",
+      "participle": "Participle"
+    },
+    "persons": {
+      "1s": "1st Sg.",
+      "2s": "2nd Sg.",
+      "3s": "3rd Sg.",
+      "1p": "1st Pl.",
+      "2p": "2nd Pl.",
+      "3p": "3rd Pl."
+    },
+    "genders": {
+      "masculine": "Masculine",
+      "feminine": "Feminine",
+      "neuter": "Neuter"
+    },
+    "types": {
+      "contract": "Contract",
+      "athematic": "Athematic"
+    },
+    "ui": {
+      "mode_person": "Mood / Person",
+      "others": "Others"
+    },
+    "labels": {
+      "verb": "Verb"
+    }
   },
   "phonetic": {
     "title": "Greek Letters",

@@ -3,6 +3,8 @@
     "nav": {
       "letras": "Letras",
       "vocabulario": "Vocabulario",
+      "declinaciones": "Declinaciones",
+      "verbos": "Verbos",
       "memory": "Memoria",
       "lectura": "Lectura",
       "home": "Herramientas",
@@ -18,7 +20,10 @@
       "philosophers_poets": "Filósofos y Poetas",
       "hero_desc": "Una suite de herramientas modernas diseñadas para ayudarte a aprender, leer y escribir griego antiguo con precisión y belleza.",
       "get_started": "Empezar",
-      "explore_tools": "Explorar herramientas"
+      "explore_tools": "Explorar herramientas",
+      "game": "Juego",
+      "study": "Estudiar",
+      "correct_answer": "Respuesta Correcta"
     }
   },
   "pages": {
@@ -30,6 +35,14 @@
       "vocabulario": {
         "title": "Vocabulario",
         "desc": "Domina las palabras más frecuentes de la literatura griega antigua."
+      },
+      "declinaciones": {
+        "title": "Declinaciones",
+        "desc": "Practica las formas de sustantivos y adjetivos."
+      },
+      "verbos": {
+        "title": "Verbos",
+        "desc": "Domina los paradigmas de conjugación del griego antiguo."
       },
       "memory": {
         "title": "Memoria",
@@ -88,10 +101,20 @@
     "memory": {
       "title": "Memoria Clásica",
       "desc": "Empareja letras, nombres y símbolos en este juego clásico. Selecciona uno de cada categoría para formar un conjunto."
+    },
+    "declinaciones": {
+      "title": "Declinaciones de Sustantivos",
+      "desc": "Practica las diversas formas de sustantivos y adjetivos en griego antiguo."
+    },
+    "verbos": {
+      "title": "Conjugación Verbal",
+      "desc": "Domina las complejas reglas de los verbos del griego antiguo."
     }
   },
   "memory": {
     "labels": {
+      "greek": "Griego",
+      "translation": "Traducción",
       "name": "Nombre",
       "upper": "Mayúscula",
       "lower": "Minúscula",
@@ -109,6 +132,89 @@
       "difficult_note": "Nota: ¡Seleccionar más columnas hace el juego significativamente más difícil!"
     },
     "instructions": "Elige uno de cada categoría para formar un conjunto"
+  },
+  "declinations": {
+    "title": "Declinaciones",
+    "cases": {
+      "nominative": "Nominativo",
+      "genitive": "Genitivo",
+      "dative": "Dativo",
+      "accusative": "Acusativo",
+      "vocative": "Vocativo"
+    },
+    "hints": {
+      "nominative": "El/La [palabra]",
+      "genitive": "de la [palabra]",
+      "dative": "para la [palabra]",
+      "accusative": "a la [palabra] (obj.)",
+      "vocative": "¡Oh [palabra]!"
+    },
+    "usage": {
+      "nominative": "Sujeto",
+      "genitive": "Posesión / De",
+      "dative": "Obj. Indirecto / Para",
+      "accusative": "Objeto Directo",
+      "vocative": "Vocación / Llamar"
+    },
+    "numbers": {
+      "singular": "Singular",
+      "plural": "Plural"
+    },
+    "genders": {
+      "masculine": "Masculino",
+      "feminine": "Femenino",
+      "neuter": "Neutro"
+    },
+    "ui": {
+      "case": "Caso"
+    },
+    "labels": {
+      "noun": "Sustantivo"
+    }
+  },
+  "verbs": {
+    "title": "Conjugación Verbal",
+    "tenses": {
+      "present": "Presente",
+      "imperfect": "Imperfecto",
+      "future": "Futuro",
+      "aorist": "Aoristo",
+      "perfect": "Perfecto",
+      "pluperfect": "Pluscuamperfecto",
+      "future_perfect": "Futuro Perfecto"
+    },
+    "moods": {
+      "indicative": "Indicativo",
+      "imperative": "Imperativo",
+      "subjunctive": "Subjuntivo",
+      "optative": "Optativo",
+      "infinitive": "Infinitivo",
+      "participle": "Participio"
+    },
+    "persons": {
+      "1s": "1ª Sg.",
+      "2s": "2ª Sg.",
+      "3s": "3ª Sg.",
+      "1p": "1ª Pl.",
+      "2p": "2ª Pl.",
+      "3p": "3ª Pl."
+    },
+    "genders": {
+      "masculine": "Masculino",
+      "feminine": "Femenino",
+      "neuter": "Neutro"
+    },
+    "types": {
+      "contract": "Contracto",
+      "athematic": "Atemático"
+    },
+    "ui": {
+      "mode_person": "Modo / Pers.",
+      "others": "Otros"
+    },
+    "labels": {
+      "verb": "Verbo"
+    }
   },
   "phonetic": {
     "title": "Letras Griegas",

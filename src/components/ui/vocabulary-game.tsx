@@ -12,45 +12,6 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-type Word = {
-  greek: string;
-  en: string;
-  es: string;
-};
-
-const VOCAB_DATA: Word[] = [
-  { greek: "ὁ, ἡ, τό", en: "the", es: "el, la, lo" },
-  { greek: "καί", en: "and", es: "y" },
-  { greek: "αὐτός", en: "self, he/she/it", es: "mismo, él/ella" },
-  { greek: "δέ", en: "but, and", es: "pero, y" },
-  { greek: "ἐν", en: "in, at", es: "en" },
-  { greek: "γάρ", en: "for", es: "porque, pues" },
-  { greek: "εἰμί", en: "to be", es: "ser, estar" },
-  { greek: "οὗτος", en: "this", es: "este, esta" },
-  { greek: "μή", en: "not", es: "no" },
-  { greek: "λέγω", en: "to say, speak", es: "decir, hablar" },
-  { greek: "εἰς", en: "into", es: "hacia, en" },
-  { greek: "οὐ", en: "not", es: "no" },
-  { greek: "ὅς", en: "who, which", es: "quien, el cual" },
-  { greek: "πᾶς", en: "all, every", es: "todo, cada" },
-  { greek: "σύ", en: "you", es: "tú" },
-  { greek: "ἄν", en: "modal particle", es: "partícula modal" },
-  { greek: "τίς", en: "who? which?", es: "quién? cuál?" },
-  { greek: "ἐγώ", en: "I", es: "yo" },
-  { greek: "ἐπί", en: "on, upon", es: "sobre, en" },
-  { greek: "ποιέω", en: "to do, make", es: "hacer" },
-  { greek: "κατά", en: "down, according to", es: "hacia abajo, según" },
-  { greek: "μετά", en: "with, after", es: "con, después de" },
-  { greek: "ὁράω", en: "to see", es: "ver" },
-  { greek: "ἀκούω", en: "to hear", es: "oír, escuchar" },
-  { greek: "πρός", en: "towards", es: "hacia, junto a" },
-  { greek: "γίγνομαι", en: "to become", es: "llegar a ser" },
-  { greek: "διά", en: "through, because of", es: "a través de, por" },
-  { greek: "ἔχω", en: "to have, hold", es: "tener" },
-  { greek: "δίδωμι", en: "to give", es: "dar" },
-  { greek: "πολύς", en: "much, many", es: "mucho" },
-].map((w) => ({ ...w, greek: w.greek.normalize("NFC") }));
-
 function shuffle<T>(arr: T[]) {
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {
@@ -62,13 +23,17 @@ function shuffle<T>(arr: T[]) {
 
 import { useLanguage } from "@/components/language-provider";
 import { useGame } from "@/components/game-provider";
+import { VOCAB_DATA, Word } from "@/lib/vocab-data";
+
+import { playSuccessSound, playErrorSound } from "@/lib/audio";
 
 export function VocabularyGame() {
   const { locale } = useLanguage();
   const { setScore: setGlobalScore, setGameName, setActions, setOnReset } = useGame();
   const t = useTranslations("vocabulary");
+  const uiT = useTranslations("common.ui");
 
-  const [level, setLevel] = React.useState(10);
+  const [level, setLevel] = React.useState(100);
   const [target, setTarget] = React.useState<Word | null>(null);
   const [options, setOptions] = React.useState<Word[]>([]);
   const [feedback, setFeedback] = React.useState<
@@ -84,16 +49,6 @@ export function VocabularyGame() {
   React.useEffect(() => {
     setGlobalScore(score);
   }, [score, setGlobalScore]);
-
-  const speak = (text: string) => {
-    if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text.normalize("NFC"));
-      utterance.lang = "el-GR";
-      utterance.rate = 0.7;
-      window.speechSynthesis.speak(utterance);
-    }
-  };
 
   const nextRound = React.useCallback(() => {
     const pool = VOCAB_DATA.slice(0, level);
@@ -123,10 +78,20 @@ export function VocabularyGame() {
     return () => setOnReset(undefined);
   }, [handleReset, setOnReset]);
 
+  const speak = (text: string) => {
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text.normalize("NFC"));
+      utterance.lang = "el-GR";
+      utterance.rate = 0.7;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
   React.useEffect(() => {
     setActions(
       <div className="flex items-center gap-1.5">
-        {[10, 20, 30].map((l) => (
+        {[100, 200, 500].map((l) => (
           <Button
             key={l}
             onClick={() => setLevel(l)}
@@ -149,15 +114,22 @@ export function VocabularyGame() {
     if (greek === target.greek) {
       setFeedback("correct");
       setScore((s) => s + 1);
+      playSuccessSound();
       speak(target.greek);
       setTimeout(nextRound, 1500);
     } else {
       setFeedback("incorrect");
-      setTimeout(() => setFeedback(null), 800);
+      playErrorSound();
+      setTimeout(() => {
+        setFeedback(null);
+        nextRound();
+      }, 2500);
     }
   }
 
   if (!target) return null;
+
+  const correctValue = target.greek;
 
   return (
     <div className="game-container">
@@ -177,7 +149,7 @@ export function VocabularyGame() {
         {feedback && (
           <div
             className={cn(
-              "absolute inset-0 flex items-center justify-center backdrop-blur-md transition-all duration-300",
+              "absolute inset-0 flex flex-col items-center justify-center backdrop-blur-md transition-all duration-300 rounded-2xl",
               feedback === "correct"
                 ? "bg-emerald-500/20"
                 : "bg-destructive/20",
@@ -186,7 +158,13 @@ export function VocabularyGame() {
             {feedback === "correct" ? (
               <CheckCircle2 className="w-16 h-16 md:w-24 md:h-24 text-emerald-500 animate-in zoom-in duration-300" />
             ) : (
-              <XCircle className="w-16 h-16 md:w-24 md:h-24 text-destructive animate-in zoom-in duration-300" />
+              <>
+                <XCircle className="w-16 h-16 md:w-24 md:h-24 text-destructive animate-in zoom-in duration-300" />
+                <div className="mt-4 text-center animate-in slide-in-from-bottom-2 duration-500">
+                  <span className="text-xs uppercase tracking-widest text-muted-foreground font-bold">{uiT("correct_answer")}</span>
+                  <div className="text-2xl md:text-4xl font-bold text-emerald-500">{correctValue}</div>
+                </div>
+              </>
             )}
           </div>
         )}
@@ -199,12 +177,12 @@ export function VocabularyGame() {
             <Button
               onClick={() => handleChoice(option.greek)}
               variant="ghost"
-              disabled={feedback === "correct"}
+              disabled={!!feedback}
               className={cn(
-                "game-option",
-                feedback === "correct" && option.greek === target.greek
-                  ? "game-option-correct"
-                  : "",
+                "game-option h-full transition-all duration-300",
+                feedback === "correct" && option.greek === correctValue ? "game-option-correct" : 
+                feedback === "incorrect" && option.greek === correctValue ? "border-emerald-500 bg-emerald-500/10 scale-105 shadow-lg z-10" : 
+                feedback === "incorrect" && option.greek !== correctValue ? "opacity-30 grayscale" : "",
               )}
             >
               {option.greek}

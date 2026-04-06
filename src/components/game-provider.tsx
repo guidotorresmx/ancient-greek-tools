@@ -68,15 +68,12 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     if (state.onReset) {
       state.onReset();
     }
-    setState({
+    setState((prev) => ({
+      ...prev,
       score: 0,
       info: "",
-      gameName: "",
-      instructions: "",
-      actions: null,
       stats: {},
-      onReset: undefined,
-    });
+    }));
   }, [state.onReset]);
 
   return (

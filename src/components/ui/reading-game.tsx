@@ -57,6 +57,20 @@ export function ReadingGame() {
   const { setGameName, setInfo, setOnReset } = useGame();
   const [currentSentenceIdx, setCurrentSentenceIdx] = React.useState(0);
   const [isPlaying, setIsPlaying] = React.useState(false);
+
+  const resetGame = React.useCallback(() => {
+    setCurrentSentenceIdx(0);
+    setIsPlaying(false);
+    setActiveWordIdx(null);
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+  }, []);
+
+  React.useEffect(() => {
+    setOnReset(resetGame);
+    return () => setOnReset(undefined);
+  }, [setOnReset, resetGame]);
   const [activeWordIdx, setActiveWordIdx] = React.useState<number | null>(null);
   const sentences = React.useMemo(() => {
     const raw = t.raw("sentences") as any[];
@@ -94,30 +108,56 @@ export function ReadingGame() {
 
   const sentence = sentences[currentSentenceIdx];
 
+  const isPlayingRef = React.useRef(false);
+
   const playSentence = async () => {
-    if (isPlaying) return;
+    if (isPlaying) {
+      isPlayingRef.current = false;
+      setIsPlaying(false);
+      window.speechSynthesis.cancel();
+      setActiveWordIdx(null);
+      return;
+    }
+    
     setIsPlaying(true);
+    isPlayingRef.current = true;
 
     for (let i = 0; i < sentence.words.length; i++) {
+      if (!isPlayingRef.current) break;
       setActiveWordIdx(i);
 
       // Speak the word
       if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(
           sentence.words[i].greek.normalize("NFC"),
         );
         utterance.lang = "el-GR";
         utterance.rate = 0.6;
-        window.speechSynthesis.speak(utterance);
-      }
 
-      await new Promise((resolve) =>
-        setTimeout(resolve, sentence.words[i].duration + 200),
-      );
+        const startPromise = new Promise((resolve) => {
+          utterance.onstart = resolve;
+          utterance.onerror = resolve;
+        });
+
+        window.speechSynthesis.speak(utterance);
+        
+        await startPromise;
+        if (!isPlayingRef.current) break;
+
+        await new Promise((resolve) =>
+          setTimeout(resolve, sentence.words[i].duration || 500)
+        );
+      } else {
+        await new Promise((resolve) =>
+          setTimeout(resolve, (sentence.words[i].duration || 500) + 100)
+        );
+      }
     }
 
     setActiveWordIdx(null);
     setIsPlaying(false);
+    isPlayingRef.current = false;
   };
 
   const nextSentence = () => {
@@ -196,14 +236,13 @@ export function ReadingGame() {
 
         <Button
           onClick={playSentence}
-          disabled={isPlaying}
           size="lg"
           className="h-14 w-14 md:h-16 md:w-16 rounded-full shadow-2xl shadow-primary/30 hover:scale-110 active:scale-95 transition-all text-white"
         >
           {isPlaying ? (
-            <Pause className="w-5 h-5 md:w-6 md:h-6" />
+            <Pause className="w-5 h-5 md:w-6 md:h-6 fill-current" />
           ) : (
-            <Play className="w-5 h-5 md:w-6 md:h-6 fill-current" />
+            <Play className="w-5 h-5 md:w-6 md:h-6 fill-current ml-1" />
           )}
         </Button>
 
